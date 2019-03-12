@@ -30,9 +30,80 @@
     </div> <!-- public -->
 
     <div v-if="public_address">
-      <img style="margin: 30px 0 20px 0" src="../assets/logo.png"><br>
-      <p>You're now logged as<br><b>{{ public_address }}</b></p>
+      <div v-if="wallet_backup === 'YES'">
+        <img style="margin: 30px 0 20px 0" height="40" src="../assets/logo.png"><br>
+        <p>You're now logged as<br><b>{{ public_address }}</b></p>
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
+              <h3>
+                Active Polls
+                <b-button v-b-modal.createModal style="float:right" variant="success">Create new</b-button>
+              </h3>
+              <div v-if="activePolls.length === 0">
+                No polls to show..
+              </div>
+              <div v-if="activePolls.length > 0">
 
+              </div>
+            </div>
+          </div>
+        </div>
+         <b-modal id="createModal" hide-footer title="Create new poll">
+          <div class="text-left">
+            Poll name:<br>
+            <b-form-input v-model="pollName" type="text" placeholder="Poll name"></b-form-input><br>
+            <div class="row">
+              <div class="col-6">
+                Start date:<br>
+                <b-form-input v-model="pollStartDate" type="date" placeholder="Start date"></b-form-input>
+                At:<br>
+                <b-form-input v-model="pollStartTime" type="text" pattern="([01]?[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}" placeholder="Start time (HH:mm)"></b-form-input><br>
+              </div>
+              <div class="col-6">
+                End date:<br>
+                <b-form-input v-model="pollEndDate" type="date" placeholder="End date"></b-form-input>
+                At:<br>
+                <b-form-input v-model="pollEndTime" type="text" pattern="([01]?[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}" placeholder="End time (HH:mm)"></b-form-input><br>
+              </div>
+            </div>
+            Question:<br>
+            <b-form-textarea
+              v-model="pollQuestion"
+              placeholder="Poll question"
+              rows="6"
+              max-rows="6"
+            /><br>
+            <div class="text-left">
+              Answers:
+              <a href="#" v-on:click="addAnswer()"><v-icon name="plus" style="float:right; cursor:pointer"/></a>
+              <br>
+              <ul style="list-style:none; padding:0">
+                <li v-for="(item, index) in pollAnswers" :key="index" style="position:relative; margin-bottom:2px;">
+                  <b-form-input v-model="item.answer" type="text" placeholder="Write an answer"></b-form-input>
+                  <a href="#" v-on:click="removeAnswer(index)"><v-icon name="trash" style="position:absolute; top:10px; right:10px"/></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="my-2 text-left" v-if="!isUploading">
+            <b-button v-if="connected" style="margin-top:10px; width:100%" v-on:click="createPoll" variant="success">Create</b-button>
+          </div>
+          <div class="my-2 text-center" v-if="isUploading">
+            Creating poll, please wait..
+          </div>
+        </b-modal>
+      </div>
+      <div v-if="wallet_backup === 'NO'">
+        <img style="margin: 30px 0 20px 0" src="../assets/logo.png"><br>
+        <h1>Scrypta Polls System</h1><br><br><br>
+        <v-icon name="lock" scale="4"/><br><br>
+        <i>You've to make a backup.</i><br>
+        Please remind, you are the ONLY responsible for this .sid file or the password associated.<br>
+        No one will have a copy or will be able to rescue it, so keep it safe.<br><br>
+        <b-button v-if="connected" v-on:click="makeBackup" variant="success">Download it now</b-button>
+        <a id="downloadsid" style="display:none"></a>
+      </div>
     </div> <!-- platform -->
 
   </div>
@@ -79,6 +150,8 @@
 </style>
 
 <script>
+const cookies = require('browser-cookies');
+const moment = require('moment')
 
 export default {
   name: 'home',
@@ -104,7 +177,9 @@ export default {
         var app = this
         if(app.connected == ''){
           app.connected = app.nodes[Math.floor(Math.random()*app.nodes.length)];
-          app.checkBalance()
+          app.connected = 'idanode01.scryptachain.org'
+          app.checkBalance(app.public_address)
+          app.fetchPolls()
         }
       },
       checkUser(){
@@ -112,6 +187,7 @@ export default {
           this.$emit('onFoundUser', this.scrypta.keyExsist(), this.scrypta.RAWsAPIKey)
           this.public_address = this.scrypta.PubAddress
           this.encrypted_wallet = this.scrypta.RAWsAPIKey
+          this.wallet_backup = cookies.get('wallet_backup');
         }
       },
       openImportWallet(){
@@ -138,6 +214,7 @@ export default {
                 api_secret: response.api_secret
               })
               .then(function () {
+                cookies.set('wallet_backup', 'NO');
                 location.reload()
               })
               .catch(function () {
@@ -167,20 +244,153 @@ export default {
           alert('Write your password first')
         }
       },
-      checkBalance(){
+      async checkBalance(address){
         var app = this
         if(app.public_address !== ''){
           app.axios.post('https://' + app.connected + '/getbalance', {
-                address: app.public_address
+              address: address
+            })
+            .then(function (response) {
+              return response.data.data
+            });
+        }
+      },
+      makeBackup(){
+        var a = document.getElementById("downloadsid");
+          var file = new Blob([this.public_address+':'+this.encrypted_wallet], {type: 'sid'});
+          a.href = URL.createObjectURL(file);
+          a.download = this.public_address+'.sid';
+          var clickEvent = new MouseEvent("click", {
+              "view": window,
+              "bubbles": true,
+              "cancelable": false
+          });
+          a.dispatchEvent(clickEvent);
+          cookies.set('wallet_backup', 'YES');
+          this.wallet_backup = 'YES'
+      },
+      fetchPolls(){
+        const app = this
+        app.axios.post('https://' + app.connected + '/read', {
+            protocol: 'poll://',
+            json: true,
+            history: false,
+            decrypt: false
+          })
+          .then(function (response) {
+            var polls = response.data.data
+            
+            for (var i=0; i < polls.length; i++){
+              var poll = polls[i].data
+              var visible = moment().isBetween(poll.start_date + ' ' + poll.start_time, poll.end_date + ' ' + poll.start_time)
+              if(visible === true){
+                app.activePolls.push(polls[i])
+              } else {
+                var next = moment().isBefore(poll.start_date + ' ' + poll.start_time)
+                if(next === true){
+                  app.nextPolls.push(polls[i])
+                } else {
+                  app.prevPolls.push(polls[i])
+                }
+              }
+            }
+
+          });
+      },
+      createrand() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 25; i++)
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+      },
+      createPoll(){
+        const app = this
+        if(app.pollName !== '' && app.pollStartDate !== '' && app.pollStartTime !== '' && app.pollEndDate !== '' && app.pollEndTime !== '' && app.pollQuestion !== '' && app.pollAnswers.length > 0 && app.isUploading === false){
+          app.isUploading = true
+          var randpass = app.createrand()
+          var pollPrivateKey
+
+          app.scrypta.createAddress(randpass,false).then(function (response) {
+
+            app.pollAddress = response.pub
+            app.pollPubKey = response.key
+            pollPrivateKey = response.prv
+            
+            app.axios.post('https://' + app.connected + '/init', {
+                address: response.pub,
+                api_secret: response.api_secret
               })
-              .then(function (response) {
-                app.address_balance = response.data.data + ' LYRA'
+              .then(function () {
+                var pollData = {
+                  name: app.pollName,
+                  start_date: app.pollStartDate,
+                  start_time: app.pollStartTime,
+                  end_date: app.pollEndDate,
+                  end_time: app.pollEndTime,
+                  question: app.pollQuestion,
+                  answers: app.pollAnswers
+                };
+                var dataToWrite = JSON.stringify(pollData);
+                var formData = new FormData();
+                formData.append("dapp_address", app.pollAddress);
+                formData.append("private_key", pollPrivateKey);
+                formData.append("encryption", false);
+                formData.append("protocol", "poll://");
+                formData.append("data", dataToWrite);
+                formData.append("refID", app.pollName);
+                
+                app.axios.post('https://' + app.connected + '/write', formData)
+                .then(function (response) {
+                  if(response.data.data.txs !== undefined){
+                    alert('Poll published, it will be ready soon!')
+                    app.$refs.createModal.hide()
+                    app.isUploading = false
+                    app.pollAddress = ''
+                    app.pollPubKey = ''
+                    app.pollName = ''
+                    app.pollQuestion = ""
+                    app.pollStartDate = ''
+                    app.pollStartTime = ''
+                    app.pollEndDate = ''
+                    app.pollEndTime = ''
+                    app.pollAnswers = [
+                      { answer: '' },
+                      { answer: '' }
+                    ]
+                  }else{
+                    alert(app.data.data)
+                  }
+                })
               })
               .catch(function () {
                 alert("Seems there's a problem, please retry or change node!")
-              });
+              })
+          })
+
+        }else{
+          alert('Please write the form correctly')
         }
       },
+      addAnswer(){
+        this.pollAnswers.push({
+          answer: ""
+        });
+      },
+      removeAnswer(index){
+        const app = this
+        if(app.pollAnswers.length > 2){
+          var newAnswersArray = [] 
+          for(var i = 0; i < app.pollAnswers.length; i++){
+            if(i !== index){
+              newAnswersArray.push(app.pollAnswers[i])
+            }
+          }
+          app.pollAnswers = newAnswersArray
+        }
+      }
   },
   data () {
     return {
@@ -196,7 +406,24 @@ export default {
       public_address: '',
       address_balance: 'BALANCE UNKNOWN',
       passwordShow: false,
-      importShow: false
+      importShow: false,
+      isUploading: false,
+      wallet_backup: '',
+      pollAddress: '',
+      pollPubKey: '',
+      pollName: '',
+      pollQuestion: "",
+      pollStartDate: '',
+      pollStartTime: '',
+      pollEndDate: '',
+      pollEndTime: '',
+      pollAnswers: [
+        { answer: '' },
+        { answer: '' }
+      ],
+      activePolls: [],
+      nextPolls: [],
+      prevPolls: []
     }
   }
 }
