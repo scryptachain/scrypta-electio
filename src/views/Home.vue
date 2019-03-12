@@ -32,7 +32,7 @@
     <div v-if="public_address">
       <div v-if="wallet_backup === 'YES'">
         <img style="margin: 30px 0 20px 0" height="40" src="../assets/logo.png"><br>
-        <p>You're now logged as<br><b>{{ public_address }}</b></p>
+        <p>You're now logged as<br><b>{{ public_address }}</b> ({{ address_balance }} LYRA)</p>
         <div class="container">
           <div class="row">
             <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
@@ -44,8 +44,60 @@
                 No polls to show..
               </div>
               <div v-if="activePolls.length > 0">
-
-              </div>
+                <b-card 
+                  v-for="(poll, index) in activePolls" :key="index"
+                  :title="poll.refID"
+                  tag="article"
+                  style="max-width: 20rem; text-align: center; margin-top:15px"
+                >
+                  <b-card-text class="text-center">
+                    <div v-if="poll.data.owner === public_address" style="position: absolute; top:5px; right:8px">
+                      <a href="#" v-on:click="managePoll()">
+                        <v-icon name="edit"></v-icon>
+                      </a>
+                    </div>
+                    <span style="font-size:12px">Published at</span><br>
+                    <b style="font-size:12px">{{ poll.address }}</b><br>
+                    <i>Start: {{ poll.data.start_date }} at {{ poll.data.start_time }}</i><br>
+                    <i>End: {{ poll.data.end_date }} at {{ poll.data.end_time }}</i><br>
+                    <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
+                  </b-card-text>
+                </b-card>
+              </div><!-- active-polls -->
+              <div v-if="nextPolls.length > 0" style="margin-top:30px">
+                <h3>
+                  Upcoming Polls
+                </h3>
+                <b-card 
+                  v-for="(poll, index) in nextPolls" :key="index"
+                  :title="poll.refID"
+                  tag="article"
+                  style="max-width: 20rem; text-align: center; margin-top:15px"
+                >
+                  <b-card-text class="text-center">
+                    <div v-if="poll.data.owner === public_address" style="position: absolute; top:5px; right:8px">
+                      <a href="#" v-on:click="managePoll()">
+                        <v-icon name="edit"></v-icon>
+                      </a>
+                    </div>
+                    <span style="font-size:12px">Published at</span><br>
+                    <b style="font-size:12px">{{ poll.address }}</b><br>
+                    <i>Start: {{ poll.data.start_date }} at {{ poll.data.start_time }}</i><br>
+                    <i>End: {{ poll.data.end_date }} at {{ poll.data.end_time }}</i><br>
+                    <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
+                  </b-card-text>
+                </b-card>
+              </div><!-- upcoming-polls -->
+              <b-modal id="joinModal" ref="joinModalRef" hide-footer title="Join poll">
+                <div class="my-2 text-center">
+                  <p>
+                    By joining <b>"{{ selectedPoll.refID }}"</b> you will send a request transaction to <b>{{ selectedPoll.address }}</b> (the poll itself) and you will be authorized to participate.<br><br>
+                    Your identity and your vote can't be linked, so vote sincerely.
+                  </p>
+                  <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
+                  <b-button v-if="connected" v-on:click="joinPoll()" variant="success">Join</b-button>
+                </div>
+              </b-modal>
             </div>
           </div>
         </div>
@@ -178,7 +230,7 @@ export default {
         if(app.connected == ''){
           app.connected = app.nodes[Math.floor(Math.random()*app.nodes.length)];
           app.connected = 'idanode01.scryptachain.org'
-          app.checkBalance(app.public_address)
+          app.checkBalance()
           app.fetchPolls()
         }
       },
@@ -244,14 +296,14 @@ export default {
           alert('Write your password first')
         }
       },
-      async checkBalance(address){
+      checkBalance(){
         var app = this
         if(app.public_address !== ''){
           app.axios.post('https://' + app.connected + '/getbalance', {
-              address: address
+              address: app.public_address
             })
             .then(function (response) {
-              return response.data.data
+              app.address_balance = response.data.data
             });
         }
       },
@@ -326,6 +378,7 @@ export default {
               .then(function () {
                 var pollData = {
                   name: app.pollName,
+                  owner: app.public_address,
                   start_date: app.pollStartDate,
                   start_time: app.pollStartTime,
                   end_date: app.pollEndDate,
@@ -346,20 +399,7 @@ export default {
                 .then(function (response) {
                   if(response.data.data.txs !== undefined){
                     alert('Poll published, it will be ready soon!')
-                    app.$refs.createModal.hide()
-                    app.isUploading = false
-                    app.pollAddress = ''
-                    app.pollPubKey = ''
-                    app.pollName = ''
-                    app.pollQuestion = ""
-                    app.pollStartDate = ''
-                    app.pollStartTime = ''
-                    app.pollEndDate = ''
-                    app.pollEndTime = ''
-                    app.pollAnswers = [
-                      { answer: '' },
-                      { answer: '' }
-                    ]
+                    location.reload()
                   }else{
                     alert(app.data.data)
                   }
@@ -390,6 +430,45 @@ export default {
           }
           app.pollAnswers = newAnswersArray
         }
+      },
+      selectJoinPoll(poll){
+        const app = this
+        app.selectedPoll = poll
+        this.$refs.joinModalRef.show()
+      },
+      joinPoll(){
+        const app = this
+        if(app.selectedPoll.address !== null){
+           app.scrypta.readKey(this.unlockPwd).then(function (response) {
+            if(response !== false){
+              var addrPrivKey = response.prv
+              console.log(addrPrivKey)
+              app.axios.post('https://' + app.connected + '/send',
+                { 
+                  from: app.public_address, 
+                  to: app.selectedPoll.address, 
+                  amount: 0.001, 
+                  private_key: addrPrivKey,
+                  message: 'POLLAUTHREQUEST'
+                })
+                .then(function () {
+                  alert('Request sent!')
+                })
+                .catch(function () {
+                  alert("Seems there's a problem, please retry or change node!")
+                })
+
+            }else{
+              alert('Wrong password!')
+            }
+          })
+
+        } else {
+          alert('Select a poll first!')
+        }
+      },
+      managePoll(uuid){
+        alert(uuid)
       }
   },
   data () {
@@ -404,7 +483,7 @@ export default {
       createPwd: '',
       createPwdConfirm: '',
       public_address: '',
-      address_balance: 'BALANCE UNKNOWN',
+      address_balance: '-',
       passwordShow: false,
       importShow: false,
       isUploading: false,
@@ -423,7 +502,8 @@ export default {
       ],
       activePolls: [],
       nextPolls: [],
-      prevPolls: []
+      prevPolls: [],
+      selectedPoll: []
     }
   }
 }
