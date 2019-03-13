@@ -51,16 +51,21 @@
                   style="max-width: 20rem; text-align: center; margin-top:15px"
                 >
                   <b-card-text class="text-center">
-                    <div v-if="poll.data.owner === public_address" style="position: absolute; top:5px; right:8px">
-                      <a href="#" v-on:click="managePoll()">
-                        <v-icon name="edit"></v-icon>
-                      </a>
-                    </div>
                     <span style="font-size:12px">Published at</span><br>
                     <b style="font-size:12px">{{ poll.address }}</b><br>
                     <i>Start: {{ poll.data.start_date }} at {{ poll.data.start_time }}</i><br>
                     <i>End: {{ poll.data.end_date }} at {{ poll.data.end_time }}</i><br>
-                    <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
+                    <div v-if="poll.data.owner !== public_address">
+                      <div v-if="joinedPolls.indexOf(poll.address) < 0">
+                        <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
+                      </div>
+                      <div v-if="joinedPolls.indexOf(poll.address) >= 0">
+                        <b-button v-on:click="selectVotePoll(poll)" variant="success" style="margin-top:10px">Vote now</b-button>
+                      </div>
+                    </div>
+                    <div v-if="poll.data.owner === public_address">
+                      <b-button v-on:click="managePoll(poll)" variant="primary" style="margin-top:10px">Manage</b-button>
+                    </div>
                   </b-card-text>
                 </b-card>
               </div><!-- active-polls -->
@@ -75,16 +80,16 @@
                   style="max-width: 20rem; text-align: center; margin-top:15px"
                 >
                   <b-card-text class="text-center">
-                    <div v-if="poll.data.owner === public_address" style="position: absolute; top:5px; right:8px">
-                      <a href="#" v-on:click="managePoll()">
-                        <v-icon name="edit"></v-icon>
-                      </a>
-                    </div>
                     <span style="font-size:12px">Published at</span><br>
                     <b style="font-size:12px">{{ poll.address }}</b><br>
                     <i>Start: {{ poll.data.start_date }} at {{ poll.data.start_time }}</i><br>
                     <i>End: {{ poll.data.end_date }} at {{ poll.data.end_time }}</i><br>
-                    <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
+                    <div v-if="poll.data.owner !== public_address">
+                      <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
+                    </div>
+                    <div v-if="poll.data.owner === public_address">
+                      <b-button v-on:click="managePoll(poll)" variant="primary" style="margin-top:10px">Manage</b-button>
+                    </div>
                   </b-card-text>
                 </b-card>
               </div><!-- upcoming-polls -->
@@ -96,6 +101,16 @@
                   </p>
                   <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
                   <b-button v-if="connected" v-on:click="joinPoll()" variant="success">Join</b-button>
+                </div>
+              </b-modal>
+              <b-modal id="voteModal" ref="voteModalRef" hide-footer title="Vote poll">
+                <div class="my-2 text-center">
+                  <p>
+                    You are few steps away, you need to unlock your wallet in order to generate the vote card, then the admin have to validate your card by sending you some of his coins.<br>
+                    You will use these coins to vote, so your account will remain anonym.
+                  </p>
+                  <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
+                  <b-button v-if="connected" v-on:click="obtainCard()" variant="success">Obtain vote card</b-button>
                 </div>
               </b-modal>
             </div>
@@ -202,8 +217,10 @@
 </style>
 
 <script>
-const cookies = require('browser-cookies');
+const cookies = require('browser-cookies')
 const moment = require('moment')
+const Gun = require('gun')
+require('gun/sea')
 
 export default {
   name: 'home',
@@ -261,13 +278,19 @@ export default {
         var app = this
         if(this.createPwd !== '' && this.createPwdConfirm === this.createPwd){
           app.scrypta.createAddress(this.createPwd,true).then(function (response) {
+            var api_secret = response.api_secret
+            var pub = response.pub
             app.axios.post('https://' + app.connected + '/init', {
                 address: response.pub,
-                api_secret: response.api_secret
+                api_secret: api_secret
               })
               .then(function () {
                 cookies.set('wallet_backup', 'NO');
-                location.reload()
+                var gun = new Gun()
+                var user = gun.user()
+                user.create(pub, api_secret, function(){
+                  location.reload()
+                });
               })
               .catch(function () {
                 alert("Seems there's a problem, please retry or change node!")
@@ -337,10 +360,12 @@ export default {
               var visible = moment().isBetween(poll.start_date + ' ' + poll.start_time, poll.end_date + ' ' + poll.start_time)
               if(visible === true){
                 app.activePolls.push(polls[i])
+                app.checkJoinPoll(polls[i])
               } else {
                 var next = moment().isBefore(poll.start_date + ' ' + poll.start_time)
                 if(next === true){
                   app.nextPolls.push(polls[i])
+                  app.checkJoinPoll(polls[i])
                 } else {
                   app.prevPolls.push(polls[i])
                 }
@@ -364,11 +389,12 @@ export default {
           app.isUploading = true
           var randpass = app.createrand()
           var pollPrivateKey
-
+          var pollPubKey
+          
           app.scrypta.createAddress(randpass,false).then(function (response) {
 
             app.pollAddress = response.pub
-            app.pollPubKey = response.key
+            pollPubKey = response.key
             pollPrivateKey = response.prv
             
             app.axios.post('https://' + app.connected + '/init', {
@@ -378,6 +404,7 @@ export default {
               .then(function () {
                 var pollData = {
                   name: app.pollName,
+                  pubkey: pollPubKey,
                   owner: app.public_address,
                   start_date: app.pollStartDate,
                   start_time: app.pollStartTime,
@@ -431,33 +458,101 @@ export default {
           app.pollAnswers = newAnswersArray
         }
       },
+      checkJoinPoll(poll){
+        const app = this
+        app.axios.post('https://' + app.connected + '/received',
+          { 
+            address: poll.address
+          })
+          .then(function (response) {
+            var received = response.data.data
+            var found = false
+            for(var i=0; i < received.length; i++){
+              var tx = received[i]
+              if(tx.sender === app.public_address){
+                found = true
+              }
+            }
+            app.joinedPolls.push(poll.address)
+            return found
+          })
+      },
       selectJoinPoll(poll){
         const app = this
         app.selectedPoll = poll
-        this.$refs.joinModalRef.show()
+        app.axios.post('https://' + app.connected + '/received',
+          { 
+            address: app.selectedPoll.address
+          })
+          .then(function (response) {
+            var received = response.data.data
+            var found = false
+            for(var i=0; i < received.length; i++){
+              var tx = received[i]
+              if(tx.sender === app.public_address){
+                found = true
+              }
+            }
+            if(found === false){
+              app.$refs.joinModalRef.show()
+            }else{
+              alert('You already joined this poll!')
+            }
+          })
       },
       joinPoll(){
         const app = this
-        if(app.selectedPoll.address !== null){
+        if(app.selectedPoll.address !== null && app.isJoining === false){
            app.scrypta.readKey(this.unlockPwd).then(function (response) {
             if(response !== false){
               var addrPrivKey = response.prv
-              console.log(addrPrivKey)
+              app.isJoining = true
               app.axios.post('https://' + app.connected + '/send',
                 { 
                   from: app.public_address, 
                   to: app.selectedPoll.address, 
                   amount: 0.001, 
                   private_key: addrPrivKey,
-                  message: 'POLLAUTHREQUEST'
+                  message: 'poll://POLLAUTHREQUEST'
                 })
                 .then(function () {
+                  app.isJoining = false
+                  this.$refs.joinModalRef.hide()
                   alert('Request sent!')
                 })
                 .catch(function () {
                   alert("Seems there's a problem, please retry or change node!")
                 })
+            }else{
+              alert('Wrong password!')
+            }
+          })
 
+        } else {
+          alert('Select a poll first!')
+        }
+      },
+      selectVotePoll(poll){
+        const app = this
+        app.$refs.voteModalRef.show()
+      },
+      obtainCard(){
+        const app = this
+        if(app.selectedPoll.address !== null && app.isObtaining === false){
+           app.scrypta.readKey(this.unlockPwd).then(function (response) {
+            if(response !== false){
+              app.isObtaining = true
+              app.axios.post('https://' + app.connected + '/initlink',
+                { 
+                  addresses:  ',' + response.key
+                })
+                .then(function () {
+                  app.isObtaining = false
+                  this.$refs.voteModalRef.hide()
+                })
+                .catch(function () {
+                  alert("Seems there's a problem, please retry or change node!")
+                })
             }else{
               alert('Wrong password!')
             }
@@ -475,6 +570,7 @@ export default {
     return {
       scrypta: window.ScryptaCore,
       axios: window.axios,
+      gunUser: [],
       nodes: [],
       connected: '',
       encrypted_wallet: 'NO WALLET',
@@ -487,6 +583,8 @@ export default {
       passwordShow: false,
       importShow: false,
       isUploading: false,
+      isJoining: false,
+      isObtaining: false,
       wallet_backup: '',
       pollAddress: '',
       pollPubKey: '',
@@ -503,7 +601,9 @@ export default {
       activePolls: [],
       nextPolls: [],
       prevPolls: [],
-      selectedPoll: []
+      selectedPoll: [],
+      joinedPolls: [],
+      votedPolls: []
     }
   }
 }
