@@ -1,7 +1,6 @@
 <template>
   <div class="home">
     <div class="node-badge" v-if="connected">{{ connected }}</div>
-
     <div v-if="!public_address">
       <img style="margin: 30px 0 20px 0" src="../assets/logo.png"><br>
       <h1>Scrypta Polls System</h1>
@@ -28,12 +27,11 @@
         Connecting to the first available node..
       </div>
     </div> <!-- public -->
-
     <div v-if="public_address">
       <div v-if="wallet_backup === 'YES'">
         <img style="margin: 30px 0 20px 0" height="40" src="../assets/logo.png"><br>
         <p>You're now logged as<br><b>{{ public_address }}</b> ({{ address_balance }} LYRA)</p>
-        <div class="container">
+        <div class="container" v-if="!votingShow && !manageShow">
           <div class="row">
             <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
               <h3>
@@ -103,20 +101,54 @@
                   <b-button v-if="connected" v-on:click="joinPoll()" variant="success">Join</b-button>
                 </div>
               </b-modal>
-              <b-modal id="voteModal" ref="voteModalRef" hide-footer title="Vote poll">
+            </div>
+          </div>
+        </div> <!-- main-page -->
+        <div class="container" v-if="votingShow">
+          <div class="row">
+            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
+              <h3>
+                Vote Poll
+                <b-button v-on:click="votingShow = false" style="float:right" variant="success">Go back</b-button>
+              </h3>
+            </div>
+          </div>
+        </div> <!-- voting-page -->
+        <div class="container" v-if="manageShow">
+          <div class="row">
+            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
+              <h3>
+                Manage {{ selectedPoll.refID }}
+                <b-button v-on:click="votingShow = false" style="float:right" variant="success">Go back</b-button>
+              </h3>
+            </div>
+            <div class="col-sm-6 text-left">
+              <h5>
+                Requested Cards
+              </h5>
+              <div v-for="(card, index) in requestedCards" :key="index" style="border:1px solid #ccc; border-radius:5px; padding:10px 0 10px 10px">
+                {{ card }}
+                <b-button v-on:click="showAuthorizeCard(card)" style="float:right; font-size: 12px;padding: 4px 10px;margin-right: 10px;margin-top: -2px;" variant="success">Authorize</b-button>
+              </div>
+              <b-modal id="authModal" ref="authModalRef" hide-footer title="Join poll">
                 <div class="my-2 text-center">
                   <p>
-                    You are few steps away, you need to unlock your wallet in order to generate the vote card, then the admin have to validate your card by sending you some of his coins.<br>
-                    You will use these coins to vote, so your account will remain anonym.
+                    You're creating a brand new address and encrypting it with the public RSA of the user.<br> 
+                    You're sending even 0.006 LYRA from your balance as voting card, this address will use this funds for making the vote.
                   </p>
                   <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
-                  <b-button v-if="connected" v-on:click="obtainCard()" variant="success">Obtain vote card</b-button>
+                  <b-button v-if="connected" v-on:click="authorizeCard()" variant="success">Authorize</b-button>
                 </div>
               </b-modal>
             </div>
+            <div class="col-sm-6 text-left">
+              <h5>
+                Votes
+              </h5>
+            </div>
           </div>
-        </div>
-         <b-modal id="createModal" hide-footer title="Create new poll">
+        </div> <!-- voting-page -->
+        <b-modal id="createModal" hide-footer title="Create new poll">
           <div class="text-left">
             Poll name:<br>
             <b-form-input v-model="pollName" type="text" placeholder="Poll name"></b-form-input><br>
@@ -152,16 +184,16 @@
                 </li>
               </ul>
             </div>
-          </div>
-          <div class="my-2 text-left" v-if="!isUploading">
-            <b-button v-if="connected" style="margin-top:10px; width:100%" v-on:click="createPoll" variant="success">Create</b-button>
-          </div>
-          <div class="my-2 text-center" v-if="isUploading">
-            Creating poll, please wait..
-          </div>
-        </b-modal>
+        </div>
+        <div class="my-2 text-left" v-if="!isUploading">
+          <b-button v-if="connected" style="margin-top:10px; width:100%" v-on:click="createPoll" variant="success">Create</b-button>
+        </div>
+        <div class="my-2 text-center" v-if="isUploading">
+          Creating poll, please wait..
+        </div>
+      </b-modal>
       </div>
-      <div v-if="wallet_backup === 'NO'">
+      <div v-if="wallet_backup === 'NO' || !wallet_backup">
         <img style="margin: 30px 0 20px 0" src="../assets/logo.png"><br>
         <h1>Scrypta Polls System</h1><br><br><br>
         <v-icon name="lock" scale="4"/><br><br>
@@ -214,13 +246,17 @@
   .custom-file-input:active::before {
     background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9); 
   }
+  .card{
+    float:left;
+    width: 20rem!important;
+    margin: 0 1rem;
+  }
 </style>
 
 <script>
 const cookies = require('browser-cookies')
 const moment = require('moment')
-const Gun = require('gun')
-require('gun/sea')
+const NodeRSA = require('node-rsa')
 
 export default {
   name: 'home',
@@ -281,16 +317,12 @@ export default {
             var api_secret = response.api_secret
             var pub = response.pub
             app.axios.post('https://' + app.connected + '/init', {
-                address: response.pub,
+                address: pub,
                 api_secret: api_secret
               })
               .then(function () {
                 cookies.set('wallet_backup', 'NO');
-                var gun = new Gun()
-                var user = gun.user()
-                user.create(pub, api_secret, function(){
-                  location.reload()
-                });
+                location.reload();
               })
               .catch(function () {
                 alert("Seems there's a problem, please retry or change node!")
@@ -354,20 +386,21 @@ export default {
           })
           .then(function (response) {
             var polls = response.data.data
-            
             for (var i=0; i < polls.length; i++){
               var poll = polls[i].data
-              var visible = moment().isBetween(poll.start_date + ' ' + poll.start_time, poll.end_date + ' ' + poll.start_time)
-              if(visible === true){
-                app.activePolls.push(polls[i])
-                app.checkJoinPoll(polls[i])
-              } else {
-                var next = moment().isBefore(poll.start_date + ' ' + poll.start_time)
-                if(next === true){
-                  app.nextPolls.push(polls[i])
-                  app.checkJoinPoll(polls[i])
+              if(polls[i].data !== null && poll.start_date !== undefined){
+                var visible = moment().isAfter(poll.start_date + ' ' + poll.start_time)
+                if(visible === true){
+                  var next = moment().isBefore(poll.end_date + ' ' + poll.end_time)
+                  if(next === true){
+                    app.activePolls.push(polls[i])
+                    app.checkJoinPoll(polls[i])
+                  } else {
+                    app.prevPolls.push(polls[i])
+                  }
                 } else {
-                  app.prevPolls.push(polls[i])
+                    app.nextPolls.push(polls[i])
+                    app.checkJoinPoll(polls[i])
                 }
               }
             }
@@ -405,6 +438,7 @@ export default {
                 var pollData = {
                   name: app.pollName,
                   pubkey: pollPubKey,
+                  privkey: pollPrivateKey,
                   owner: app.public_address,
                   start_date: app.pollStartDate,
                   start_time: app.pollStartTime,
@@ -473,7 +507,9 @@ export default {
                 found = true
               }
             }
-            app.joinedPolls.push(poll.address)
+            if(found === true){
+              app.joinedPolls.push(poll.address)
+            }
             return found
           })
       },
@@ -513,12 +549,26 @@ export default {
                   to: app.selectedPoll.address, 
                   amount: 0.001, 
                   private_key: addrPrivKey,
-                  message: 'poll://POLLAUTHREQUEST'
+                  message: 'poll://AUTHREQUEST'
                 })
                 .then(function () {
-                  app.isJoining = false
-                  this.$refs.joinModalRef.hide()
-                  alert('Request sent!')
+                  app.axios.post('https://' + app.connected + '/storage/write',
+                  { 
+                    dapp: app.selectedPoll.address,
+                    collection: 'AUTHREQUEST',
+                    data: {
+                      "address": app.public_address,
+                      "pubkey": response.rsapub
+                    }
+                  })
+                  .then(function () {
+                    app.isJoining = false
+                    app.$refs.joinModalRef.hide()
+                    alert('Request sent!')
+                  })
+                  .catch(function () {
+                    alert("Seems there's a problem, please retry or change node!")
+                  })
                 })
                 .catch(function () {
                   alert("Seems there's a problem, please retry or change node!")
@@ -534,25 +584,142 @@ export default {
       },
       selectVotePoll(poll){
         const app = this
-        app.$refs.voteModalRef.show()
+        app.selectedPoll = poll
+        app.scrypta.readKey(app.unlockPwd).then(function (response) {
+          const key = new NodeRSA(response.rsaprv);
+          app.axios.post('https://' + app.connected + '/read',
+            { 
+              address: app.selectedPoll.address,
+              json: true,
+              history: false,
+              decrypt: false,
+              protocol: 'poll://'
+            })
+            .then(function (response) {
+              var txs = response.data.data
+              var decrypted = ''
+              for(var i=0; i < txs.length; i++){
+                var tx = txs[i]
+                if(decrypted === ''){
+                  try {
+                    decrypted = key.decrypt(tx.data, 'utf8');
+                  } catch(err){
+                    //NOTHING TO DECRYPT
+                  }
+                }
+              }
+              if(decrypted.length > 0){
+                app.votingShow = true
+                var votingCard = decrypted.split(',')
+                app.axios.post('https://' + app.connected + '/send',
+                  { 
+                    from: votingCard[0], 
+                    to: app.selectedPoll.address, 
+                    amount: 0.004, 
+                    private_key: votingCard[1],
+                    message: 'poll://VOTE:1'
+                  })
+                  .then(function () {
+                    //TODO: DO SOMETHING
+                  })
+                  .catch(function () {
+                    alert("Seems there's a problem, please retry or change node!")
+                  })
+              }
+            })
+            .catch(function () {
+              alert("Seems there's a problem, please retry or change node!")
+            })
+        })
       },
-      obtainCard(){
+      managePoll(poll){
         const app = this
-        if(app.selectedPoll.address !== null && app.isObtaining === false){
+        app.selectedPoll = poll
+        app.axios.post('https://' + app.connected + '/storage/read',
+          { 
+            dapp: app.selectedPoll.address,
+            collection: 'AUTHREQUEST'
+          })
+          .then(function (response) {
+           app.manageShow = true
+           var cards = response.data.data
+           for(var i=0; i < cards.length; i++){
+             var card = cards[i]
+             if(card['data']['address'] && card['data']['pubkey']){
+               app.requestedCards.push(card['data']['address'])
+               app.authRequests[card['data']['address']] = card
+             }
+           }
+          })
+          .catch(function () {
+            alert("Seems there's a problem, please retry or change node!")
+          })
+      },
+      showAuthorizeCard(card){
+        const app = this
+        app.selectedCard = card
+        app.$refs.authModalRef.show()
+      },
+      authorizeCard(){
+        const app = this
+        if(app.selectedPoll.address !== null && app.isAuthorizing === false){
            app.scrypta.readKey(this.unlockPwd).then(function (response) {
             if(response !== false){
-              app.isObtaining = true
-              app.axios.post('https://' + app.connected + '/initlink',
-                { 
-                  addresses:  ',' + response.key
-                })
-                .then(function () {
-                  app.isObtaining = false
-                  this.$refs.voteModalRef.hide()
-                })
-                .catch(function () {
-                  alert("Seems there's a problem, please retry or change node!")
-                })
+              app.isAuthorizing = true
+              var addrPrivKey = response.prv
+              var request = app.authRequests[app.selectedCard]
+              var pubkey = request.data.pubkey
+              const key = new NodeRSA(pubkey)
+              app.scrypta.createAddress(app.createrand(), false).then(function(response){
+                var newAddress = response.pub
+                var newSecret = response.api_secret
+                const encrypted = key.encrypt(response.pub + ',' + response.prv, 'base64')
+                app.axios.post('https://' + app.connected + '/init', {
+                    address: newAddress,
+                    api_secret: newSecret
+                  })
+                  .then(function () {
+                    app.axios.post('https://' + app.connected + '/send',
+                    { 
+                      from: app.public_address, 
+                      to: newAddress, 
+                      amount: 0.006, 
+                      private_key: addrPrivKey,
+                      message: 'poll://VOTECARD'
+                    })
+                    .then(function () {
+                      app.axios.post('https://' + app.connected + '/write',
+                        { 
+                          dapp_address: app.selectedPoll.address, 
+                          encryption: false, 
+                          private_key: app.selectedPoll.data.privkey,
+                          protocol: 'poll://',
+                          data: encrypted
+                        })
+                        .then(function () {
+                          app.axios.post('https://' + app.connected + '/storage/remove',
+                            { 
+                              uuid: request._id.$oid
+                            })
+                            .then(function () {
+                              app.isAuthorizing = false
+                              app.authorizedCards.push(app.selectedCard)
+                              app.$refs.authModalRef.hide()
+                              alert('Authorization sent!')
+                            })
+                            .catch(function () {
+                              alert("Seems there's a problem, please retry or change node!")
+                            })
+                          })
+                        })
+                        .catch(function () {
+                          alert("Seems there's a problem, please retry or change node!")
+                        })
+                    .catch(function () {
+                      alert("Seems there's a problem, please retry or change node!")
+                    })
+                  })
+              })
             }else{
               alert('Wrong password!')
             }
@@ -561,16 +728,13 @@ export default {
         } else {
           alert('Select a poll first!')
         }
-      },
-      managePoll(uuid){
-        alert(uuid)
+        
       }
   },
   data () {
     return {
       scrypta: window.ScryptaCore,
       axios: window.axios,
-      gunUser: [],
       nodes: [],
       connected: '',
       encrypted_wallet: 'NO WALLET',
@@ -582,9 +746,12 @@ export default {
       address_balance: '-',
       passwordShow: false,
       importShow: false,
+      votingShow: false,
       isUploading: false,
+      manageShow: false,
       isJoining: false,
       isObtaining: false,
+      isAuthorizing: false,
       wallet_backup: '',
       pollAddress: '',
       pollPubKey: '',
@@ -603,7 +770,11 @@ export default {
       prevPolls: [],
       selectedPoll: [],
       joinedPolls: [],
-      votedPolls: []
+      votedPolls: [],
+      authRequests: [],
+      requestedCards: [],
+      authorizedCards: [],
+      selectedCard: ''
     }
   }
 }
