@@ -29,11 +29,15 @@
     </div> <!-- public -->
     <div v-if="public_address">
       <div v-if="wallet_backup === 'YES'">
-        <img style="margin: 30px 0 20px 0" height="40" src="../assets/logo.png"><br>
-        <p>You're now logged as<br><b>{{ public_address }}</b> ({{ address_balance }} LYRA)</p>
-        <div class="container" v-if="!votingShow && !manageShow && !votedShow">
+        <div style="position:relative; height:60px; padding:20px; text-align:left">
+          <img style="float:left" height="40" src="../assets/logo.png">
+          <h3 style="float:left; margin-top:2px; margin-left:20px;">Scrypta Polls</h3>
+          <div style="float:right; text-align:right">Hi <b>{{ public_address }}</b><br>{{ address_balance }} LYRA</div>
+        </div>
+        <hr>
+        <div class="container" v-if="!votingShow && !manageShow && !votedShow && !resultsShow">
           <div class="row">
-            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
+            <div class="col-sm-12 text-left" style="padding-top:15px">
               <h3>
                 Active Polls
                 <b-button v-b-modal.createModal style="float:right" variant="success">Create new</b-button>
@@ -74,16 +78,53 @@
                     If you voted yet you'll be able to see and verify your vote.
                   </p>
                   <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
-                  <b-button v-if="connected" v-on:click="selectVotePoll()" variant="success">Search</b-button>
+                  <b-button v-if="!isSearching" v-on:click="selectVotePoll()" variant="success">Search</b-button>
+                  <div class="text-center" v-if="isSearching">Searching..</div>
                 </div>
               </b-modal>
               </div><!-- active-polls -->
-              <div v-if="nextPolls.length > 0" style="margin-top:30px">
-                <h3>
-                  Upcoming Polls
-                </h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px; margin-top: 20px;">
+              <h3>
+                Upcoming Polls
+              </h3>
+              <div v-if="nextPolls.length === 0">
+                No polls to show..
+              </div>
+              <b-card 
+                v-for="(poll, index) in nextPolls" :key="index"
+                :title="poll.refID"
+                tag="article"
+                style="max-width: 20rem; text-align: center; margin-top:15px"
+              >
+                <b-card-text class="text-center">
+                  <span style="font-size:12px">Published at</span><br>
+                  <b style="font-size:11px">{{ poll.address }}</b><br>
+                  <i>Start: {{ poll.data.start_date }} at {{ poll.data.start_time }}</i><br>
+                  <i>End: {{ poll.data.end_date }} at {{ poll.data.end_time }}</i><br>
+                  <div v-if="poll.data.owner !== public_address">
+                    <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
+                  </div>
+                  <div v-if="poll.data.owner === public_address">
+                    <b-button v-on:click="managePoll(poll)" variant="primary" style="margin-top:10px">Manage</b-button>
+                  </div>
+                </b-card-text>
+              </b-card>
+            </div><!-- upcoming-polls -->
+          </div>
+          <div class="row">
+            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px; margin-top: 20px;">
+              <h3>
+                Past Polls
+              </h3>
+              <div v-if="prevPolls.length === 0">
+                No polls to show..
+              </div>
+              <div v-if="prevPolls.length > 0">
                 <b-card 
-                  v-for="(poll, index) in nextPolls" :key="index"
+                  v-for="(poll, index) in prevPolls" :key="index"
                   :title="poll.refID"
                   tag="article"
                   style="max-width: 20rem; text-align: center; margin-top:15px"
@@ -93,31 +134,27 @@
                     <b style="font-size:11px">{{ poll.address }}</b><br>
                     <i>Start: {{ poll.data.start_date }} at {{ poll.data.start_time }}</i><br>
                     <i>End: {{ poll.data.end_date }} at {{ poll.data.end_time }}</i><br>
-                    <div v-if="poll.data.owner !== public_address">
-                      <b-button v-on:click="selectJoinPoll(poll)" variant="primary" style="margin-top:10px">Join request</b-button>
-                    </div>
-                    <div v-if="poll.data.owner === public_address">
-                      <b-button v-on:click="managePoll(poll)" variant="primary" style="margin-top:10px">Manage</b-button>
-                    </div>
+                    <b-button v-on:click="pollResults(poll)" variant="primary" style="margin-top:10px">Results</b-button>
                   </b-card-text>
                 </b-card>
-              </div><!-- upcoming-polls -->
-              <b-modal id="joinModal" ref="joinModalRef" hide-footer title="Join poll">
-                <div class="my-2 text-center">
-                  <p>
-                    By joining <b>"{{ selectedPoll.refID }}"</b> you will send a request transaction to <b>{{ selectedPoll.address }}</b> (the poll itself) and you will be authorized to participate.<br><br>
-                    Your identity and your vote can't be linked, so vote sincerely.
-                  </p>
-                  <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
-                  <b-button v-if="connected" v-on:click="joinPoll()" variant="success">Join</b-button>
                 </div>
-              </b-modal>
-            </div>
+            </div> <!-- past-polls -->
           </div>
+          <b-modal id="joinModal" ref="joinModalRef" hide-footer title="Join poll">
+            <div class="my-2 text-center">
+              <p>
+                By joining <b>"{{ selectedPoll.refID }}"</b> you will send a request transaction to <b>{{ selectedPoll.address }}</b> (the poll itself) and you will be authorized to participate.<br><br>
+                Your identity and your vote can't be linked, so vote sincerely.
+              </p>
+              <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
+              <b-button v-if="!isJoining" v-on:click="joinPoll()" variant="success">Join</b-button>
+              <div class="text-center" v-if="isJoining">Joining, please wait..</div>
+            </div>
+          </b-modal>
         </div> <!-- main-page -->
         <div class="container" v-if="votingShow">
           <div class="row">
-            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
+            <div class="col-sm-12 text-left" style="padding-top:15px">
               <h3>
                 {{ selectedPoll.data.question }}
                 <b-button v-on:click="votingShow = false" style="float:right" variant="success">Go back</b-button>
@@ -136,7 +173,7 @@
         </div> <!-- voting-page -->
         <div class="container" v-if="votedShow">
           <div class="row">
-            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
+            <div class="col-sm-12 text-left" style="padding-top:15px">
               <h3>
                 {{ selectedPoll.data.question }}
                 <b-button v-on:click="votedShow = false" style="float:right" variant="success">Go back</b-button>
@@ -152,10 +189,11 @@
         </div> <!-- voting-page -->
         <div class="container" v-if="manageShow">
           <div class="row">
-            <div class="col-sm-12 text-left" style="border-top:1px solid #ccc; padding-top:15px">
+            <div class="col-sm-12 text-left" style="padding-top:15px">
               <h3>
                 Manage {{ selectedPoll.refID }}
-                <b-button v-on:click="votingShow = false" style="float:right" variant="success">Go back</b-button>
+                <b-button style="font-size:13px; padding:4px" v-on:click="managePoll(selectedPoll)" variant="primary">Refresh</b-button>
+                <b-button v-on:click="manageShow = false" style="float:right" variant="success">Go back</b-button>
               </h3>
             </div>
             <div class="col-sm-12 text-left">
@@ -169,6 +207,13 @@
                 {{ card }}
                 <b-button v-on:click="showAuthorizeCard(card)" style="float:right; font-size: 12px;padding: 4px 10px;margin-right: 10px;margin-top: -2px;" variant="success">Authorize</b-button>
               </div>
+              <h5 style="margin-top:20px">Authorized users</h5>
+              <div v-for="(card, index) in sentCards" :key="index" style="border:1px solid #ccc; border-radius:5px; padding:10px 0 10px 10px">
+                {{ card }}
+              </div>
+              <div v-if="sentCards.length === 0">
+                No one is authorized yet..
+              </div>
               <b-modal id="authModal" ref="authModalRef" hide-footer title="Join poll">
                 <div class="my-2 text-center">
                   <p>
@@ -176,7 +221,8 @@
                     You're sending even 0.002 LYRA from your balance as voting card, this address will use this funds for making the vote.
                   </p>
                   <b-form-input v-model="unlockPwd" class="text-center" type="password" placeholder="Enter address password first."></b-form-input><br>
-                  <b-button v-if="connected" v-on:click="authorizeCard()" variant="success">Authorize</b-button>
+                  <b-button v-on:click="authorizeCard()" v-if="!isAuthorizing" variant="success">Authorize</b-button>
+                  <div class="text-center" v-if="isAuthorizing">Authorizing, please wait..</div>
                 </div>
               </b-modal>
             </div>
@@ -184,11 +230,48 @@
               <h5>
                 Votes
               </h5>
-              {{ votes }}
-              //TODO: CREATE A GRAPH AND TABLE FOR VOTES
+              <div v-for="(answer, index) in selectedPoll.data.answers" v-on:click="selectVote(index)" class="answer" :key="index">
+                {{ index }}.
+                {{ answer.answer }}
+                <div style="position:absolute; top:10px; font-weight:bold; right:15px;">
+                  <span v-if="votes[index]">
+                    {{ votes[index] }}
+                  </span>
+                  <span v-if="!votes[index]">
+                    0
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div> <!-- voting-page -->
+        <div class="container" v-if="resultsShow">
+          <div class="row">
+            <div class="col-sm-12 text-left" style="padding-top:15px">
+              <h3>
+                Results for {{ selectedPoll.refID }}
+                <b-button v-on:click="resultsShow = false" style="float:right" variant="success">Go back</b-button>
+              </h3>
+              <div v-for="(answer, index) in selectedPoll.data.answers" v-on:click="selectVote(index)" class="answer" :key="index">
+                {{ index }}.
+                {{ answer.answer }}
+                <div style="position:absolute; top:10px; font-weight:bold; right:15px;">
+                  <span v-if="votes[index]">
+                    {{ votes[index] }}
+                  </span>
+                  <span v-if="!votes[index]">
+                    0
+                  </span>
+                </div>
+              </div>
+              <hr>
+              <h3>Complete list of addresses that requested to vote</h3>
+              {{ requestedCards }}
+              <h3>Complete list of accepted addresses</h3>
+              {{ sentCards }}
+            </div>
+          </div>
+        </div>
         <b-modal id="createModal" hide-footer title="Create new poll">
             <div class="text-left">
               Poll name:<br>
@@ -243,6 +326,10 @@
         No one will have a copy or will be able to rescue it, so keep it safe.<br><br>
         <b-button v-if="connected" v-on:click="makeBackup" variant="success">Download it now</b-button>
         <a id="downloadsid" style="display:none"></a>
+      </div>
+      <hr>
+      <div class="text-center" style="margin-top:30px">
+        Open Source Project developed by Scrypta Task Force.
       </div>
     </div> <!-- platform -->
 
@@ -303,6 +390,9 @@
   .answer:hover, .answer-selected{
     cursor:pointer;
     background:#efefef;
+  }
+  body{
+    padding-bottom: 30px
   }
 </style>
 
@@ -611,7 +701,8 @@ export default {
                     collection: 'AUTHREQUEST',
                     data: {
                       "address": app.public_address,
-                      "pubkey": response.rsapub
+                      "pubkey": response.rsapub,
+                      "sent": false
                     }
                   })
                   .then(function () {
@@ -642,65 +733,71 @@ export default {
       },
       selectVotePoll(){
         const app = this
-        app.scrypta.readKey(app.unlockPwd).then(function (response) {
-          const key = new NodeRSA(response.rsaprv);
-          app.axios.post('https://' + app.connected + '/read',
-            { 
-              address: app.selectedPoll.address,
-              json: true,
-              history: false,
-              decrypt: false,
-              protocol: 'poll://'
-            })
-            .then(function (response) {
-              var txs = response.data.data
-              var decrypted = ''
-              for(var i=0; i < txs.length; i++){
-                var tx = txs[i]
-                if(decrypted === ''){
-                  try {
-                    decrypted = key.decrypt(tx.data, 'utf8');
-                  } catch(err){
-                    //NOTHING TO DECRYPT
+        if(app.isSearching === false){
+          app.isSearching = true
+          app.scrypta.readKey(app.unlockPwd).then(function (response) {
+            const key = new NodeRSA(response.rsaprv);
+            app.axios.post('https://' + app.connected + '/read',
+              { 
+                address: app.selectedPoll.address,
+                json: true,
+                history: false,
+                decrypt: false,
+                protocol: 'poll://'
+              })
+              .then(function (response) {
+                var txs = response.data.data
+                var decrypted = ''
+                for(var i=0; i < txs.length; i++){
+                  var tx = txs[i]
+                  if(decrypted === ''){
+                    try {
+                      decrypted = key.decrypt(tx.data, 'utf8');
+                    } catch(err){
+                      //NOTHING TO DECRYPT
+                    }
                   }
                 }
-              }
-              if(decrypted.length > 0){
-                var votingCard = decrypted.split(',')
-                app.votingCard = votingCard
-                app.axios.post('https://' + app.connected + '/received',
-                  { 
-                    address: app.selectedPoll.address
-                  })
-                  .then(function (response) {
-                    var txs = response.data.data
-                    var voted = false
-                    for(var i=0; i<txs.length; i++){
-                      var tx=txs[i]
-                      if(tx.sender === app.votingCard[0]){
-                        var exp = tx.data.split(':')
-                        if(exp[0] === 'poll' && exp[1] === '//VOTE'){
-                          app.voted = exp[2]
-                          app.votelink = 'https://chainz.cryptoid.info/lyra/tx.dws?' + tx.txid + '.htm'
-                          voted = true
+                if(decrypted.length > 0){
+                  var votingCard = decrypted.split(',')
+                  app.votingCard = votingCard
+                  app.axios.post('https://' + app.connected + '/received',
+                    { 
+                      address: app.selectedPoll.address
+                    })
+                    .then(function (response) {
+                      var txs = response.data.data
+                      var voted = false
+                      for(var i=0; i<txs.length; i++){
+                        var tx=txs[i]
+                        if(tx.sender === app.votingCard[0]){
+                          var exp = tx.data.split(':')
+                          if(exp[0] === 'poll' && exp[1] === '//VOTE'){
+                            app.voted = exp[2]
+                            app.votelink = 'https://chainz.cryptoid.info/lyra/tx.dws?' + tx.txid + '.htm'
+                            voted = true
+                          }
                         }
                       }
-                    }
-                    if(voted === false){
-                      app.votingShow = true
-                    }else{
-                      app.votedShow = true
-                    }
-                  })
-                  .catch(function(){
-                    alert("Seems there's a problem, please retry or change node!")
-                  })
-              }
-            })
-            .catch(function () {
-              alert("Seems there's a problem, please retry or change node!")
-            })
-        })
+                      if(voted === false){
+                        app.votingShow = true
+                      }else{
+                        app.votedShow = true
+                      }
+                    })
+                    .catch(function(){
+                      alert("Seems there's a problem, please retry or change node!")
+                    })
+                } else {
+                  alert('Authorization not found, retry later!')
+                  app.isSearching = false
+                }
+              })
+              .catch(function () {
+                alert("Seems there's a problem, please retry or change node!")
+              })
+          })
+        }
       },
       selectVote(index){
         const app = this
@@ -738,7 +835,7 @@ export default {
         const app = this
         app.selectedPoll = poll
         app.requestedCards = []
-        //SEARCH AUTH REQUESTS
+        app.sentCards = []
         app.axios.post('https://' + app.connected + '/storage/read',
           { 
             dapp: app.selectedPoll.address,
@@ -750,7 +847,9 @@ export default {
            for(var i=0; i < cards.length; i++){
              var card = cards[i]
              if(card['data']['address'] && card['data']['pubkey']){
-               app.requestedCards.push(card['data']['address'])
+               if(card['data']['pubkey']){
+                  app.requestedCards.push(card['data']['address'])
+               }
                app.authRequests[card['data']['address']] = card
              }
            }
@@ -758,7 +857,12 @@ export default {
           .catch(function () {
             alert("Seems there's a problem, please retry or change node!")
           })
-        //SEARCH VOTES
+        app.pollResults(app.selectedPoll, false)
+      },
+      pollResults(poll, showResultsPage = true){
+        const app = this
+        app.selectedPoll = poll
+        app.votes = []
         app.axios.post('https://' + app.connected + '/received',
           { 
             address: app.selectedPoll.address
@@ -777,6 +881,19 @@ export default {
                   app.votes[exp[2]] = 1
                 }
               }
+              if(showResultsPage === true){
+                if(exp[0] === 'poll' && exp[1] === '//AUTHREQUEST'){
+                  app.requestedCards.push(tx.sender)
+                }
+              }
+              if(exp[0] === 'poll' && exp[1] === '//AUTH'){
+                if(exp[2] !== undefined && exp[2] !== 'undefined'){
+                  app.sentCards.push(exp[2])
+                }
+              }
+            }
+            if(showResultsPage === true){
+              app.resultsShow = true
             }
           })
           .catch(function(){
@@ -833,11 +950,21 @@ export default {
                                   uuid: request._id.$oid
                                 })
                                 .then(function () {
-                                  app.isAuthorizing = false
-                                  app.authorizedCards.push(app.selectedCard)
-                                  app.$refs.authModalRef.hide()
-                                  app.managePoll(app.selectedPoll)
-                                  alert('Authorization sent!')
+                                  app.axios.post('https://' + app.connected + '/send',
+                                    { 
+                                      from: app.public_address, 
+                                      to: app.selectedPoll.address, 
+                                      amount: 0.001, 
+                                      private_key: addrPrivKey,
+                                      message: 'poll://AUTH:' + request.data.address
+                                    })
+                                    .then(function (){
+                                      app.isAuthorizing = false
+                                      app.authorizedCards.push(app.selectedCard)
+                                      app.$refs.authModalRef.hide()
+                                      app.managePoll(app.selectedPoll)
+                                      alert('Authorization sent!')
+                                    })
                                 })
                                 .catch(function () {
                                   alert("Seems there's a problem, please retry or change node!")
@@ -879,6 +1006,7 @@ export default {
       passwordShow: false,
       importShow: false,
       votingShow: false,
+      resultsShow: false,
       votedShow: false,
       isUploading: false,
       isVoting: false,
@@ -886,6 +1014,7 @@ export default {
       isJoining: false,
       isObtaining: false,
       isAuthorizing: false,
+      isSearching: false,
       wallet_backup: '',
       pollAddress: '',
       pollPubKey: '',
@@ -907,6 +1036,7 @@ export default {
       votedPolls: [],
       authRequests: [],
       requestedCards: [],
+      sentCards: [],
       authorizedCards: [],
       selectedCard: '',
       votingCard: [],
