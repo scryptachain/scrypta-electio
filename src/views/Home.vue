@@ -235,8 +235,9 @@
             </div>
             <div class="col-sm-12 text-left" style="margin-top:20px; padding-top:20px; border-top:1px solid #ccc">
               <h5>
-                Votes
+                Partial results
               </h5>
+              <p>"{{ selectedPoll.data.question }}"</p>
               <div v-for="(answer, index) in selectedPoll.data.answers" v-on:click="selectVote(index)" class="answer" :key="index">
                 {{ index }}.
                 {{ answer.answer }}
@@ -259,6 +260,7 @@
                 Results for {{ selectedPoll.refID }}
                 <b-button v-on:click="resultsShow = false" class="back-btn" style="float:right" variant="success">Go back</b-button>
               </h3>
+              <p>"{{ selectedPoll.data.question }}"</p>
               <div v-for="(answer, index) in selectedPoll.data.answers" v-on:click="selectVote(index)" class="answer" :key="index">
                 {{ index }}.
                 {{ answer.answer }}
