@@ -31,8 +31,15 @@
       <div v-if="wallet_backup === 'YES'">
         <div style="position:relative; height:60px; padding:20px; text-align:left">
           <img style="float:left" height="40" src="../assets/logo.png">
-          <h3 style="float:left; margin-top:2px; margin-left:20px;">Scrypta Polls</h3>
-          <div style="float:right; text-align:right">Hi <b>{{ public_address }}</b><br>{{ address_balance }} LYRA</div>
+          <h3 class="d-none d-md-block d-lg-block d-xl-block" style="float:left; margin-top:2px; margin-left:20px;">Scrypta Polls</h3>
+          <div style="float:right; text-align:right">
+            <span class="d-none d-md-block d-lg-block d-xl-block">
+              Hi <b>{{ public_address }}</b><br>
+            </span>
+            <span class="m-20-top-mobile">
+              {{ address_balance }} LYRA
+            </span>
+          </div>
         </div>
         <hr>
         <div class="container" v-if="!votingShow && !manageShow && !votedShow && !resultsShow">
@@ -157,7 +164,7 @@
             <div class="col-sm-12 text-left" style="padding-top:15px">
               <h3>
                 {{ selectedPoll.data.question }}
-                <b-button v-on:click="votingShow = false" style="float:right" variant="success">Go back</b-button>
+                <b-button v-on:click="votingShow = false" class="back-btn" style="float:right" variant="success">Go back</b-button>
               </h3>
               <div v-for="(answer, index) in selectedPoll.data.answers" v-on:click="selectVote(index)" class="answer" :key="index">
                 {{ index }}.
@@ -176,7 +183,7 @@
             <div class="col-sm-12 text-left" style="padding-top:15px">
               <h3>
                 {{ selectedPoll.data.question }}
-                <b-button v-on:click="votedShow = false" style="float:right" variant="success">Go back</b-button>
+                <b-button v-on:click="votedShow = false" class="back-btn" style="float:right" variant="success">Go back</b-button>
               </h3>
               <div v-for="(answer, index) in selectedPoll.data.answers" class="answer" :key="index">
                 {{ index }}.
@@ -193,7 +200,7 @@
               <h3>
                 Manage {{ selectedPoll.refID }}
                 <b-button style="font-size:13px; padding:4px" v-on:click="managePoll(selectedPoll)" variant="primary">Refresh</b-button>
-                <b-button v-on:click="manageShow = false" style="float:right" variant="success">Go back</b-button>
+                <b-button v-on:click="manageShow = false" class="back-btn" style="float:right" variant="success">Go back</b-button>
               </h3>
             </div>
             <div class="col-sm-12 text-left">
@@ -250,7 +257,7 @@
             <div class="col-sm-12 text-left" style="padding-top:15px">
               <h3>
                 Results for {{ selectedPoll.refID }}
-                <b-button v-on:click="resultsShow = false" style="float:right" variant="success">Go back</b-button>
+                <b-button v-on:click="resultsShow = false" class="back-btn" style="float:right" variant="success">Go back</b-button>
               </h3>
               <div v-for="(answer, index) in selectedPoll.data.answers" v-on:click="selectVote(index)" class="answer" :key="index">
                 {{ index }}.
@@ -265,10 +272,15 @@
                 </div>
               </div>
               <hr>
-              <h3>Complete list of addresses that requested to vote</h3>
-              {{ requestedCards }}
-              <h3>Complete list of accepted addresses</h3>
-              {{ sentCards }}
+              <h3>List of addresses</h3>
+              <div v-for="(card, index) in requestedCards" v-on:click="selectVote(index)" class="answer vote-requests" :key="index">
+                {{ card }}
+                <span v-for="(accepted, index) in sentCards" :key="index">
+                  <span v-if="accepted === card" style="float:left; color:green; margin-right:5px; margin-top:-2px">
+                    <v-icon name="check-square"/>
+                  </span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -277,13 +289,13 @@
               Poll name:<br>
               <b-form-input v-model="pollName" type="text" placeholder="Poll name"></b-form-input><br>
               <div class="row">
-                <div class="col-6">
+                <div class="col-sm-6">
                   Start date:<br>
                   <b-form-input v-model="pollStartDate" type="date" placeholder="Start date"></b-form-input>
                   At:<br>
                   <b-form-input v-model="pollStartTime" type="text" pattern="([01]?[0-9]{1}|2[0-3]{1}):[0-5]{1}[0-9]{1}" placeholder="Start time (HH:mm)"></b-form-input><br>
                 </div>
-                <div class="col-6">
+                <div class="col-sm-6">
                   End date:<br>
                   <b-form-input v-model="pollEndDate" type="date" placeholder="End date"></b-form-input>
                   At:<br>
@@ -328,7 +340,7 @@
         <a id="downloadsid" style="display:none"></a>
       </div>
       <hr>
-      <div class="text-center" style="margin-top:30px">
+      <div class="text-center footer" style="margin-top:30px">
         Open Source Project developed by Scrypta Task Force.
       </div>
     </div> <!-- platform -->
@@ -393,6 +405,16 @@
   }
   body{
     padding-bottom: 30px
+  }
+  @media screen and (max-width: 767px){
+    .m-20-top-mobile{margin-top:8px!important; float:right}
+    .card{width:100%!important; max-width:100%!important; margin:0 0 20px 0!important}
+    h3, .h3{font-size: 18px!important;}
+    .btn{font-size:12px!important; padding:4px!important;}
+    .answer{font-size:14px!important;}
+    .vote-requests{ font-size:11px!important }
+    .back-btn{margin-top:-5px!important}
+    .footer{font-size:11px; padding:0 10px}
   }
 </style>
 
@@ -863,6 +885,9 @@ export default {
         const app = this
         app.selectedPoll = poll
         app.votes = []
+        app.requestedCards = []
+        app.sentCards = []
+        
         app.axios.post('https://' + app.connected + '/received',
           { 
             address: app.selectedPoll.address
