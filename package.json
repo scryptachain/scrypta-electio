@@ -12,7 +12,7 @@
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.14",
     "browser-cookies": "^1.2.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.0",
     "moment": "^2.24.0",
     "node-rsa": "^1.0.5",
     "register-service-worker": "^1.6.2",
