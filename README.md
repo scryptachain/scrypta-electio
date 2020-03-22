@@ -1,4 +1,6 @@
-# scrypta-polls
+# Scrypta Polls System
+
+This Poll system allow everyone to create and manage secure and full anonymous polls over the Scrypta Blockchain.
 
 ## Project setup
 ```
@@ -14,16 +16,3 @@ npm run serve
 ```
 npm run build
 ```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
