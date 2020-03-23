@@ -4,7 +4,7 @@
       <b-navbar>
           <template slot="brand">
               <b-navbar-item tag="router-link" :to="{ path: '/' }">
-                  <img src="/img/logo.png" >
+                  <img src="/logo.png" >
               </b-navbar-item>
           </template>
           <template slot="start">
@@ -25,7 +25,22 @@
       </b-navbar>
       <router-view/>
     </div>
-    <div v-if="needsRSA && wallet">Need to create RSA keys!</div>
+    <div v-if="needsRSA && wallet">
+    <section class="hero">
+        <div class="hero-body">
+          <div class="container">
+            <h1 class="title">
+              Scrypta Polls System
+            </h1>
+            <h2 class="subtitle">
+              Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.<br>
+              Your address is {{ address }} but we need an RSA key before start.<br><br>
+              <b-button size="is-medium" v-on:click="showCreate">Create Keys Now!</b-button>
+            </h2>
+          </div>
+        </div>
+      </section>
+    </div>
     <div v-if="!wallet">
       <section class="hero">
         <div class="hero-body">
@@ -51,21 +66,22 @@
               <form action="">
                 <div class="modal-card" style="width: auto">
                     <header class="modal-card-head">
-                        <p class="modal-card-title">Create new Identity</p>
+                        <p v-if="!wallet" class="modal-card-title">Create new Identity</p>
+                        <p v-if="wallet" class="modal-card-title">Update Identity</p>
                     </header>
                     <section class="modal-card-body">
 
-                        <b-field label="Create a Password">
+                        <b-field label="Insert Password">
                             <b-input
                                 type="password"
                                 v-model="password"
                                 password-reveal
-                                placeholder="This will be your main password"
+                                placeholder="Your main password"
                                 required>
                             </b-input>
                         </b-field>
 
-                        <b-field label="Repeat password">
+                        <b-field v-if="!wallet" label="Repeat password">
                             <b-input
                                 type="password"
                                 v-model="passwordrepeat"
@@ -75,11 +91,15 @@
                             </b-input>
                         </b-field>
                     </section>
-                    <footer v-if="!isCreating" class="modal-card-foot">
-                        <button class="button is-primary" style="width:100%" v-on:click="createUser">CREATE</button>
+                    <footer v-if="!isCreating && !isUpdating" class="modal-card-foot">
+                        <button v-if="!wallet" class="button is-primary" style="width:100%" v-on:click="createUser">CREATE</button>
+                        <button v-if="wallet" class="button is-primary" style="width:100%" v-on:click="updateUser">UPDATE</button>
                     </footer>
                     <footer v-if="isCreating" class="modal-card-foot">
                         <div style="text-align:center">Creating identity, please wait...</div>
+                    </footer>
+                    <footer v-if="isUpdating" class="modal-card-foot">
+                        <div style="text-align:center">Updating identity, please wait...</div>
                     </footer>
                 </div>
             </form>
@@ -99,6 +119,7 @@
         isLogging: true,
         needsRSA: false,
         isCreating: false,
+        isUpdating: false,
         showCreateModal: false,
         password: '',
         passwordrepeat: ''
@@ -106,6 +127,7 @@
     },
     async mounted() {
       const app = this
+      app.wallet = await app.scrypta.importBrowserSID()
       app.wallet = await app.scrypta.returnDefaultIdentity()
       if(app.wallet.length > 0){
         let SIDS = app.wallet.split(':')
@@ -153,6 +175,35 @@
                 type: 'is-danger'
             })
           }
+        }else{
+          app.$buefy.toast.open({
+              message: 'Write a password first!',
+              type: 'is-danger'
+          })
+        }
+      },
+      async updateUser(){
+        const app = this
+        if(app.password !== ''){
+          app.isUpdating = true
+          setTimeout(async function(){
+            let res = await app.scrypta.createRSAKeys(app.address+':'+app.wallet.wallet, app.password)
+            if(res !== false){
+              let identity = await app.scrypta.returnIdentity(app.address)
+              app.needsRSA = false
+              app.wallet = identity
+              app.showCreateModal = false
+              app.password = ''
+              app.passwordrepeat = ''
+              app.isUpdating = false
+            }else{
+              app.isUpdating = false
+              app.$buefy.toast.open({
+                  message: 'Password is wrong!',
+                  type: 'is-danger'
+              })
+            }
+          }, 500)
         }else{
           app.$buefy.toast.open({
               message: 'Write a password first!',

@@ -25,9 +25,6 @@
       let SIDS = app.wallet.split(':')
       app.address = SIDS[0]
       let identity = await app.scrypta.returnIdentity(app.address)
-      if(identity.rsa === undefined){
-        app.needsRSA = true
-      }
       app.wallet = identity
       app.isLogging = false
     }
