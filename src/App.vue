@@ -11,6 +11,12 @@
               <b-navbar-item href="/#/">
                   Home
               </b-navbar-item>
+              <b-navbar-item href="/#/create">
+                  Create poll
+              </b-navbar-item>
+              <b-navbar-item href="/#/history">
+                  My History
+              </b-navbar-item>
           </template>
 
           <template slot="end">
@@ -24,6 +30,8 @@
           </template>
       </b-navbar>
       <router-view/>
+      <hr>
+      Scrypta Polls System is an <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
     </div>
     <div v-if="needsRSA && wallet">
     <section class="hero">
@@ -35,7 +43,7 @@
             <h2 class="subtitle">
               Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.<br>
               Your address is {{ address }} but we need an RSA key before start.<br><br>
-              <b-button size="is-medium" v-on:click="showCreate">Create Keys Now!</b-button>
+              <b-button size="is-medium" type="is-primary" v-on:click="showCreate">Create Keys Now!</b-button>
             </h2>
           </div>
         </div>
@@ -51,7 +59,7 @@
             <h2 class="subtitle">
               Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.<br>
               You can enter with ScryptaID extension or just create a new identity.<br><br>
-              <b-button size="is-medium" v-on:click="showCreate">Create an Identity Now!</b-button>
+              <b-button type="is-primary" size="is-medium" v-on:click="showCreate">Create an Identity Now!</b-button>
             </h2>
           </div>
         </div>
@@ -217,7 +225,7 @@
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Sen';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
