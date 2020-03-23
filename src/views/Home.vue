@@ -44,9 +44,8 @@
       let response = await app.scrypta.post('/read',{ protocol: 'poll://' })
       var polls = response.data
       for (var i=0; i < polls.length; i++){
-        var poll = polls[i].data
-        if(polls[i].data !== null && poll.start_date !== undefined){
-          console.log(poll)
+        var poll = polls[i].data.poll
+        if(polls[i].data !== null && poll !== undefined && poll.dna !== undefined && poll.dna.type === 'PUBLIC'){
           var visible = moment().isAfter(poll.start_date + ' ' + poll.start_time)
           if(visible === true){
             var next = moment().isBefore(poll.end_date + ' ' + poll.end_time)

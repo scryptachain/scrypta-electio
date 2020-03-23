@@ -148,67 +148,111 @@
       async createPoll(){
         const app = this
         if(app.pollName !== '' && app.pollStartDate !== '' && app.pollStartTime !== '' && app.pollEndDate !== '' && app.pollEndTime !== '' && app.pollQuestion !== '' && app.pollAnswers.length > 0 && app.isUploading === false){
-          app.isUploading = true
-          var randomPassword = "";
-          var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-          for (var i = 0; i < 25; i++){
-            randomPassword += possible.charAt(Math.floor(Math.random() * possible.length));
-          }
-          var pollPrivateKey
-          var pollPubKey
-          
-          app.scrypta.createAddress(randomPassword,false).then(async function (response) {
-            app.pollAddress = response.pub
-            pollPubKey = response.key
-            pollPrivateKey = response.prv
-            
-            await app.scrypta.post('/init', {
-              address: response.pub,
-              airdrop: true
-            })
-            
-            let startDate = app.pollStartDate.getFullYear() + '-' + app.pollStartDate.getMonth() + '-' + app.pollStartDate.getDate()
-            let endDate = app.pollEndDate.getFullYear() + '-' + app.pollEndDate.getMonth() + '-' + app.pollEndDate.getDate()
-            let startTime = app.pollStartTime.getHours() + ':' + app.pollStartDate.getMinutes()
-            let endTime = app.pollEndTime.getHours() + ':' + app.pollEndTime.getMinutes()
+          app.$buefy.dialog.prompt({
+            message: `Enter wallet password`,
+            inputAttrs: {
+                type: 'password'
+            },
+            trapFocus: true,
+            onConfirm: async (password) => {
+              let walletstore = app.wallet.wallet
+              let key = await app.scrypta.readKey(password,walletstore)
+              if(key !== false){
+                app.isUploading = true
+                var randomPassword = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                for (var i = 0; i < 25; i++){
+                  randomPassword += possible.charAt(Math.floor(Math.random() * possible.length));
+                }
+                var pollPrivateKey
+                var pollPubKey
+                let balance = await app.scrypta.get('/balance/' + app.address)
+                if(balance.balance > 0.04){
+                  app.scrypta.createAddress(randomPassword,false).then(async function (response) {
+                    app.pollAddress = response.pub
+                    pollPubKey = response.key
+                    pollPrivateKey = response.prv
+                    
+                    let send = await app.scrypta.post('/send',{
+                      from: app.address,
+                      to: response.pub,
+                      amount: 0.04,
+                      private_key: key.prv
+                    })
+                    if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
+                      let startDate = app.pollStartDate.getFullYear() + '-' + app.pollStartDate.getMonth() + '-' + app.pollStartDate.getDate()
+                      let endDate = app.pollEndDate.getFullYear() + '-' + app.pollEndDate.getMonth() + '-' + app.pollEndDate.getDate()
+                      let startTime = app.pollStartTime.getHours() + ':' + app.pollStartDate.getMinutes()
+                      let endTime = app.pollEndTime.getHours() + ':' + app.pollEndTime.getMinutes()
+                      
+                      let pollPrivateKeyEnc = await app.scrypta.cryptData(pollPrivateKey, key.prv)
 
-            var pollData = {
-              name: app.pollName,
-              pubkey: pollPubKey,
-              privkey: pollPrivateKey,
-              owner: app.address,
-              start_date: startDate,
-              start_time: startTime,
-              end_date: endDate,
-              end_time: endTime,
-              question: app.pollQuestion,
-              answers: app.pollAnswers
-            };
+                      var pollData = {
+                        dna: {
+                          pubkey: pollPubKey,
+                          privkey: pollPrivateKeyEnc,
+                          owner: app.address,
+                          type: app.pollType
+                        },
+                        poll: {
+                          name: app.pollName,
+                          start_date: startDate,
+                          start_time: startTime,
+                          end_date: endDate,
+                          end_time: endTime,
+                          question: app.pollQuestion,
+                          answers: app.pollAnswers
+                        }
+                      };
 
-            var dataToWrite
-            if(app.pollType === 'SECRET'){
-              let encrypted = await app.scrypta.cryptData(JSON.stringify(pollData), app.pollSecretKey)
-              dataToWrite = encrypted
-            }else{
-              dataToWrite = JSON.stringify(pollData)
-            }
+                      var dataToWrite = pollData
+                      if(app.pollType === 'SECRET'){
+                        let encrypted = await app.scrypta.cryptData(JSON.stringify(pollData.poll), app.pollSecretKey)
+                        dataToWrite.poll = encrypted
+                      }
+                      
+                      dataToWrite = JSON.stringify(dataToWrite)
 
-            let success = false
-            while(success === false){
-              let writeResponse = await app.scrypta.post('/write', 
-              {
-                dapp_address: app.pollAddress,
-                private_key: pollPrivateKey,
-                protocol: "poll://",
-                data: dataToWrite
-              })
-              if(writeResponse.success !== false){
-                success = true
+                      let success = false
+                      while(success === false){
+                        let writeResponse = await app.scrypta.post('/write', 
+                        {
+                          dapp_address: app.pollAddress,
+                          private_key: pollPrivateKey,
+                          protocol: "poll://",
+                          data: dataToWrite
+                        })
+                        if(writeResponse.success !== false){
+                          success = true
+                          app.$buefy.toast.open({
+                            message: 'Poll published, it will be ready soon!',
+                            type: 'is-success'
+                          })
+                          setTimeout(function(){
+                            window.location = '/#/history'
+                          },500)
+                        }
+                      }
+                    }else{
+                      app.isUploading = false
+                      app.$buefy.toast.open({
+                          message: "Something goes wrong, please retry.",
+                          type: 'is-danger'
+                      })
+                    }
+                  })
+                }else{
+                  app.isUploading = false
+                  app.$buefy.toast.open({
+                      message: "You need at least 0.04 LYRA, you have " + balance.balance + "!",
+                      type: 'is-danger'
+                  })
+                }
+              }else{
                 app.$buefy.toast.open({
-                  message: 'Poll published, it will be ready soon!',
-                  type: 'is-success'
+                    message: 'Wrong password!',
+                    type: 'is-danger'
                 })
-                window.location = '/#/'
               }
             }
           })

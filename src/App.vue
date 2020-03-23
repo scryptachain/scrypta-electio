@@ -59,6 +59,7 @@
             <h2 class="subtitle">
               Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.<br>
               You can enter with ScryptaID extension or just create a new identity.<br><br>
+              Your identity will be rewarded with 0.05 LYRA so you can test the platform and create polls.<br><br>
               <b-button type="is-primary" size="is-medium" v-on:click="showCreate">Create an Identity Now!</b-button>
             </h2>
           </div>
@@ -175,6 +176,16 @@
               app.showCreateModal = false
               app.password = ''
               app.passwordrepeat = ''
+              let tx = await app.scrypta.post('/init',{
+                address: id.pub,
+                airdrop: true
+              })
+              if(tx.airdrop_tx === false){
+                app.$buefy.toast.open({
+                  message: 'Sorry, airdrop was not successful!',
+                  type: 'is-danger'
+                })
+              }
               app.isCreating = false
             }, 500)
           }else{
