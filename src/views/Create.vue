@@ -167,8 +167,8 @@
               airdrop: true
             })
             
-            let startDate = app.pollStartDate.getDate() + '/' + app.pollStartDate.getMonth() + '/' + app.pollStartDate.getFullYear()
-            let endDate = app.pollEndDate.getDate() + '/' + app.pollEndDate.getMonth() + '/' + app.pollEndDate.getFullYear()
+            let startDate = app.pollStartDate.getFullYear() + '-' + app.pollStartDate.getMonth() + '-' + app.pollStartDate.getDate()
+            let endDate = app.pollEndDate.getFullYear() + '-' + app.pollEndDate.getMonth() + '-' + app.pollEndDate.getDate()
             let startTime = app.pollStartTime.getHours() + ':' + app.pollStartDate.getMinutes()
             let endTime = app.pollEndTime.getHours() + ':' + app.pollEndTime.getMinutes()
 

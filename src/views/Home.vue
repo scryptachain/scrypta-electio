@@ -46,18 +46,19 @@
       for (var i=0; i < polls.length; i++){
         var poll = polls[i].data
         if(polls[i].data !== null && poll.start_date !== undefined){
+          console.log(poll)
           var visible = moment().isAfter(poll.start_date + ' ' + poll.start_time)
           if(visible === true){
             var next = moment().isBefore(poll.end_date + ' ' + poll.end_time)
             if(next === true){
               app.activePolls.push(polls[i])
-              app.checkJoinPoll(polls[i])
+              // app.checkJoinPoll(polls[i])
             } else {
               app.prevPolls.push(polls[i])
             }
           } else {
               app.nextPolls.push(polls[i])
-              app.checkJoinPoll(polls[i])
+              // app.checkJoinPoll(polls[i])
           }
         }
       }
