@@ -77,11 +77,46 @@
               </li>
             </ul>
           </div>
+          <br>
+          <div class="text-left" v-if="pollType === 'PUBLIC'">
+            <b-message title="Please pay attention" type="is-danger" aria-close-label="Close message">
+              This poll will be PUBLIC, anyone will see it in the platform and can send a vote.
+            </b-message>
+          </div>
+          <div class="text-left" v-if="pollType === 'AUTHORIZED'">
+            <b-message title="Please pay attention" type="is-danger" aria-close-label="Close message">
+              This poll will be PUBLIC but you will authorize every account before it can send the vote.<br>
+              You can even pre-authorize the accounts, if you're doing that please make double checks and include anyone because no one will be able to request an authorization later.
+            </b-message>
+          </div>
+          <div class="text-left" v-if="pollType === 'SECRET'">
+            <b-message title="Please pay attention" type="is-danger" aria-close-label="Close message">
+              This poll will be PRIVATE and ENCRYPTED on the blockchain and you have to pre-authorize the addresses.
+            </b-message>
+          </div>
+          <div class="text-left" v-if="pollType === 'AUTHORIZED' || pollType === 'SECRET'">
+            <br>
+            <div class="label">
+              Pre-Authorized Addresses <i style="font-size:12px" v-if="pollType === 'AUTHORIZED'">(No one will be able to request authorizations later)</i>
+              <b-button v-on:click="addAuthorized()" style="float:right; margin-top:-2px" size="is-small" type="is-primary">+</b-button>
+            </div>
+            <ul style="list-style:none; padding:0">
+              <li v-for="(item, index) in pollPreAuthorized" :key="index" style="position:relative; margin-bottom:2px;">
+                <b-input v-model="item.address" placeholder="Write a valid Lyra account"></b-input>
+                <b-button size="is-small" type="is-primary" style="float:right; margin-top:-32px; margin-right:4px;" v-on:click="removeAuthorized(index)">Delete</b-button>
+              </li>
+            </ul>
+          </div>
       </div>
-      <div class="my-2 text-left" v-if="!isUploading">
+      <div class="my-2 text-left" v-if="!isUploading && !isChecking">
         <b-button style="margin-top:10px; width:100%" v-on:click="createPoll" size="is-big" type="is-primary">CREATE POLL NOW</b-button>
       </div>
+      <div class="my-2 text-center" v-if="isChecking">
+        <br>
+        Checking preauthorized addresses, please wait..
+      </div>
       <div class="my-2 text-center" v-if="isUploading">
+        <br>
         Creating poll, please wait..
       </div>
     </div>
@@ -97,6 +132,7 @@
       return {
         scrypta: new ScryptaCore(true),
         isUploading: false,
+        isChecking: false,
         address: '',
         wallet: '',
         pollAddress: '',
@@ -105,7 +141,7 @@
         pollQuestion: "",
         pollType: "PUBLIC",
         pollSecretKey: '',
-        types: ["PUBLIC","NOT LISTED","SECRET"],
+        types: ["PUBLIC","AUTHORIZED","SECRET"],
         pollStartDate: new Date(),
         pollStartTime: new Date(),
         pollEndDate: new Date(),
@@ -114,6 +150,10 @@
           { answer: '' },
           { answer: '' }
         ],
+        pollPreAuthorized: [
+          { address: '' },
+          { address: '' }
+        ]
       }
     },
     async mounted() {
@@ -145,9 +185,63 @@
           app.pollAnswers = newAnswersArray
         }
       },
+      addAuthorized(){
+        this.pollPreAuthorized.push({
+          address: ""
+        });
+      },
+      removeAuthorized(index){
+        const app = this
+        if(app.pollPreAuthorized.length > 2){
+          var newAuthorizedArray = [] 
+          for(var i = 0; i < app.pollPreAuthorized.length; i++){
+            if(i !== index){
+              newAuthorizedArray.push(app.pollPreAuthorized[i])
+            }
+          }
+          app.pollPreAuthorized = newAuthorizedArray
+        }
+      },
       async createPoll(){
         const app = this
-        if(app.pollName !== '' && app.pollStartDate !== '' && app.pollStartTime !== '' && app.pollEndDate !== '' && app.pollEndTime !== '' && app.pollQuestion !== '' && app.pollAnswers.length > 0 && app.isUploading === false){
+        let valid = true
+        if(app.pollPreAuthorized.length > 0){
+          app.isChecking = true
+          let validAddresses = []
+          for(let x in app.pollPreAuthorized){
+            let address = app.pollPreAuthorized[x]
+            if(validAddresses.indexOf(address.address) === -1){
+              if(address.address !== ''){
+                let check = await app.scrypta.get('/validate/' + address.address)
+                if(check.data.isvalid === false){
+                  valid = false
+                  app.$buefy.toast.open({
+                      message: address.address + ' is an invalid address!',
+                      type: 'is-danger'
+                  })
+                }else{
+                  valid = false
+                  app.$buefy.toast.open({
+                      message: 'This is an empty address!',
+                      type: 'is-danger'
+                  })
+                }
+              }else{
+                validAddresses.push(address)
+              }
+            }
+          }
+          app.pollPreAuthorized = validAddresses
+          app.isChecking = false
+        }
+        if(app.pollType === 'SECRET' && app.pollPreAuthorized.length === 0){
+          valid = false
+          app.$buefy.toast.open({
+              message: 'You must include autorhized addresses!',
+              type: 'is-danger'
+          })
+        }
+        if(valid && app.pollName !== '' && app.pollStartDate !== '' && app.pollStartTime !== '' && app.pollEndDate !== '' && app.pollEndTime !== '' && app.pollQuestion !== '' && app.pollAnswers.length > 0 && app.isUploading === false){
           app.$buefy.dialog.prompt({
             message: `Enter wallet password`,
             inputAttrs: {
@@ -167,7 +261,10 @@
                 var pollPrivateKey
                 var pollPubKey
                 let balance = await app.scrypta.get('/balance/' + app.address)
-                if(balance.balance > 0.04){
+                let minamount = 0.001
+                let autorizations = 0.002 * app.pollPreAuthorized.length
+                minamount += autorizations
+                if(balance.balance > minamount){
                   app.scrypta.createAddress(randomPassword,false).then(async function (response) {
                     app.pollAddress = response.pub
                     pollPubKey = response.key
@@ -176,9 +273,10 @@
                     let send = await app.scrypta.post('/send',{
                       from: app.address,
                       to: response.pub,
-                      amount: 0.04,
+                      amount: minamount,
                       private_key: key.prv
                     })
+
                     if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
                       let startDate = app.pollStartDate.getFullYear() + '-' + app.pollStartDate.getMonth() + '-' + app.pollStartDate.getDate()
                       let endDate = app.pollEndDate.getFullYear() + '-' + app.pollEndDate.getMonth() + '-' + app.pollEndDate.getDate()
@@ -202,7 +300,8 @@
                           end_time: endTime,
                           question: app.pollQuestion,
                           answers: app.pollAnswers
-                        }
+                        },
+                        authorized: app.pollPreAuthorized
                       };
 
                       var dataToWrite = pollData
@@ -244,7 +343,7 @@
                 }else{
                   app.isUploading = false
                   app.$buefy.toast.open({
-                      message: "You need at least 0.04 LYRA, you have " + balance.balance + "!",
+                      message: "You need at least " + minamount + " LYRA, you have " + balance.balance + " LYRA!",
                       type: 'is-danger'
                   })
                 }
@@ -257,10 +356,12 @@
             }
           })
         }else{
-          app.$buefy.toast.open({
-              message: 'Write all the required fields first!',
-              type: 'is-danger'
-          })
+          if(valid){
+            app.$buefy.toast.open({
+                message: 'Write all the required fields first!',
+                type: 'is-danger'
+            })
+          }
         }
       }
     }

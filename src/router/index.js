@@ -13,6 +13,21 @@ const routes = [
     path: '/create',
     name: 'Create',
     component: () => import('../views/Create.vue')
+  },
+  {
+    path: '/history',
+    name: 'History',
+    component: () => import('../views/History.vue')
+  },
+  {
+    path: '/manage/:uuid',
+    name: 'Manage',
+    component: () => import('../views/Manage.vue')
+  },
+  {
+    path: '/join/:uuid',
+    name: 'Join',
+    component: () => import('../views/Join.vue')
   }
 ]
 

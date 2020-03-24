@@ -5,9 +5,15 @@
         <h3>{{ address }}</h3>
         <hr>
         <div v-if="activePolls.length > 0">
-          {{ activePolls }}
+          <h3 class="title is-4">Active polls</h3>
+          <div v-for="poll in activePolls" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
         </div>
-        <div class="text-center" v-if="activePolls.length === 0">
+        <div v-if="nextPolls.length > 0">
+          <h3 class="title is-4">Next polls</h3>
+          <div v-for="poll in nextPolls" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
+        </div>
+        <div v-if="isLoading">Loading polls from the blockchain...</div>
+        <div class="text-center" v-if="activePolls.length === 0 && nextPolls.length === 0 && !isLoading">
           Nothing to show here, do you want to create a new poll?<br><br>
           <a href="/#/create"><b-button size="is-medium" type="is-primary">Create a Poll Now!</b-button></a>
         </div>
@@ -45,19 +51,18 @@
       var polls = response.data
       for (var i=0; i < polls.length; i++){
         var poll = polls[i].data.poll
-        if(polls[i].data !== null && poll !== undefined && poll.dna !== undefined && poll.dna.type === 'PUBLIC'){
-          var visible = moment().isAfter(poll.start_date + ' ' + poll.start_time)
+        var dna = polls[i].data.dna
+        if(poll !== undefined && dna !== undefined && dna.type === 'PUBLIC'){
+          let start = moment(poll.start_date + 'T' + poll.start_time + ':00')
+          let end = moment(poll.end_date + 'T' + poll.end_time + ':00')
+          var visible = moment().isAfter(start)
           if(visible === true){
-            var next = moment().isBefore(poll.end_date + ' ' + poll.end_time)
+            var next = moment().isBefore(end)
             if(next === true){
               app.activePolls.push(polls[i])
-              // app.checkJoinPoll(polls[i])
-            } else {
-              app.prevPolls.push(polls[i])
             }
           } else {
-              app.nextPolls.push(polls[i])
-              // app.checkJoinPoll(polls[i])
+            app.nextPolls.push(polls[i])
           }
         }
       }

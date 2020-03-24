@@ -32,6 +32,7 @@
       <router-view/>
       <hr>
       Scrypta Polls System is an <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
+      <br><br>
     </div>
     <div v-if="needsRSA && wallet">
     <section class="hero">

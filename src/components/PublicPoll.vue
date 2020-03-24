@@ -1,0 +1,96 @@
+<template>
+    <div class="card">
+        <div class="card-content">
+            <div class="media">
+                <div class="media-left">
+                    <figure class="image is-48x48">
+                        <v-gravatar :email="poll.data.dna.owner" />
+                    </figure>
+                </div>
+                <div class="media-content">
+                    <p class="title is-4">{{ poll.data.poll.name }}</p>
+                    <p class="subtitle is-6">
+                        from {{ poll.data.poll.start_date }} {{ poll.data.poll.start_time }}:00
+                        till {{ poll.data.poll.end_date }} {{ poll.data.poll.end_time }}:00
+                    </p>
+                </div>
+            </div>
+            <div class="content">
+                <div v-if="poll.data.owner !== address">
+                    <div v-if="!isJoined && poll.data.dna.owner !== address && poll.data.dna.type === 'AUTHORIZED'">
+                        <b-button v-on:click="selectJoinPoll(poll)" type="is-primary" class="float-btn">Join request</b-button>
+                    </div>
+                    <div v-if="(isJoined || poll.data.dna.type === 'PUBLIC') && poll.data.dna.owner !== address">
+                        <a :href="'/#/join/' + poll.uuid"><b-button type="is-success" class="float-btn">Enter</b-button></a>
+                    </div>
+                    <div v-if="poll.data.dna.owner === address && !isEnded">
+                        <a :href="'/#/manage/' + poll.uuid"><b-button type="is-primary" class="float-btn">Manage</b-button></a>
+                    </div>
+                    <div v-if="isEnded">
+                        <a :href="'/#/results/' + poll.uuid"><b-button type="is-primary" class="float-btn">Show results</b-button></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<style scoped>
+    .card{
+        margin-bottom:30px;
+    }
+    .float-btn{
+        position:absolute; top: 50%; right:40px; margin-top:-17.5px;
+    }
+    .card .media:not(:last-child){
+        margin-bottom:0
+    }
+</style>
+<script>
+    const ScryptaCore = require('@scrypta/core')
+    
+    export default {
+        name: 'publicpoll',
+        props: ['poll','address'],
+        data() {
+            return {
+                scrypta: new ScryptaCore(true),
+                isJoined: false,
+                isEnded: false
+            }
+        },
+        methods: {
+            checkJoinPoll(poll){
+                const app = this
+                app.scrypta.post('/received',
+                { address: poll.address })
+                .then(function (response) {
+                    var received = response.data.data
+                    var found = false
+                    for(var i=0; i < received.length; i++){
+                    var tx = received[i]
+                    if(tx.sender === app.address){
+                        found = true
+                    }
+                    }
+                    if(found === true){
+                        app.joinedPolls.push(poll.address)
+                    }
+                    return found
+                })
+            },
+            selectJoinPoll(){
+                const app = this
+                app.$buefy.dialog.prompt({
+                    message: `Enter wallet password`,
+                    inputAttrs: {
+                        type: 'password'
+                    },
+                    trapFocus: true,
+                    onConfirm: async (password) => {
+                        console.log(password)
+                    }
+                })
+            }
+        }
+    }
+</script>
