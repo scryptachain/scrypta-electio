@@ -14,7 +14,8 @@
                 <b-tab-item label="Recap">
                   <br>
                   <h3 class="title is-3">{{ poll.name }}</h3>
-                  <b>Available from</b> {{ poll.start_date }} {{ poll.start_time }}:00 <b>till</b> {{ poll.end_date }} {{ poll.end_time }}:00
+                  <b>Opened:</b> from {{ poll.start_date }} {{ poll.start_time }}:00 <b>till</b> {{ poll.end_date }} {{ poll.end_time }}:00<br>
+                  <b>Type:</b> {{ dna.type }}
                   <hr>
                   <p>{{ poll.question }}</p>
                   <hr>

@@ -18,7 +18,7 @@
             <div class="content">
                 <div v-if="poll.data.owner !== address">
                     <div v-if="!isJoined && poll.data.dna.owner !== address && poll.data.dna.type === 'AUTHORIZED'">
-                        <b-button v-on:click="selectJoinPoll(poll)" type="is-primary" class="float-btn">Join request</b-button>
+                        <b-button v-on:click="joinRequest()" type="is-primary" class="float-btn">Join request</b-button>
                     </div>
                     <div v-if="(isJoined || poll.data.dna.type === 'PUBLIC') && poll.data.dna.owner !== address">
                         <a :href="'/#/join/' + poll.uuid"><b-button type="is-success" class="float-btn">Enter</b-button></a>
@@ -58,6 +58,10 @@
                 isEnded: false
             }
         },
+        mounted(){
+            const app = this
+            app.checkJoinPoll()
+        },
         methods: {
             checkJoinPoll(poll){
                 const app = this
@@ -67,29 +71,70 @@
                     var received = response.data.data
                     var found = false
                     for(var i=0; i < received.length; i++){
-                    var tx = received[i]
-                    if(tx.sender === app.address){
-                        found = true
-                    }
+                        var tx = received[i]
+                        if(tx.sender === app.address){
+                            found = true
+                        }
                     }
                     if(found === true){
-                        app.joinedPolls.push(poll.address)
+                        app.isJoined = true
                     }
                     return found
                 })
             },
-            selectJoinPoll(){
+            async joinRequest(){
                 const app = this
-                app.$buefy.dialog.prompt({
-                    message: `Enter wallet password`,
-                    inputAttrs: {
-                        type: 'password'
-                    },
-                    trapFocus: true,
-                    onConfirm: async (password) => {
-                        console.log(password)
+                if(app.isJoined === false){
+                    let balance = await app.scrypta.get('/balance/' + app.address)
+                    if(balance.balance > 0.001){
+                        app.$buefy.dialog.prompt({
+                            message: `Enter wallet password`,
+                            inputAttrs: {
+                                type: 'password'
+                            },
+                            trapFocus: true,
+                            onConfirm: async (password) => {
+                                let walletstore = app.wallet.wallet
+                                let key = await app.scrypta.readKey(password,walletstore)
+                                let identity = await app.scrypta.returnIdentity(app.address)
+
+                                if(key !== false){
+                                    app.isUploading = true
+                                    let send = await app.scrypta.post('/send',{
+                                        from: app.address,
+                                        to: app.pollAddress,
+                                        amount: 0.0001,
+                                        private_key: key.prv,
+                                        message: 'poll://AUTHREQUEST:' + identity.rsa.pub
+                                    })
+
+                                    if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
+                                        app.$buefy.toast.open({
+                                            message: 'Request sent correctly, if the owner send the request you\'ll be able to enter and vote!',
+                                            type: 'is-success'
+                                        })
+                                    }else{
+                                        app.$buefy.toast.open({
+                                            message: 'Something goes wrong!',
+                                            type: 'is-danger'
+                                        })
+                                    }
+                                    app.isUploading = false
+                                }
+                            }
+                        })
+                    }else{
+                        app.$buefy.toast.open({
+                            message: 'You need at least 0.001 LYRA to make the request!',
+                            type: 'is-danger'
+                        })
                     }
-                })
+                }else{
+                    app.$buefy.toast.open({
+                        message: 'You\'ve joined yet!',
+                        type: 'is-danger'
+                    })
+                }
             }
         }
     }

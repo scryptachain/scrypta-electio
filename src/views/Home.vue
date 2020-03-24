@@ -52,7 +52,7 @@
       for (var i=0; i < polls.length; i++){
         var poll = polls[i].data.poll
         var dna = polls[i].data.dna
-        if(poll !== undefined && dna !== undefined && dna.type === 'PUBLIC'){
+        if(poll !== undefined && dna !== undefined && dna.type !== undefined && dna.type !== 'SECRET'){
           let start = moment(poll.start_date + 'T' + poll.start_time + ':00')
           let end = moment(poll.end_date + 'T' + poll.end_time + ':00')
           var visible = moment().isAfter(start)
