@@ -192,7 +192,7 @@
       },
       removeAuthorized(index){
         const app = this
-        if(app.pollPreAuthorized.length > 2){
+        if(app.pollPreAuthorized.length > 0){
           var newAuthorizedArray = [] 
           for(var i = 0; i < app.pollPreAuthorized.length; i++){
             if(i !== index){
@@ -261,7 +261,7 @@
                 var pollPrivateKey
                 var pollPubKey
                 let balance = await app.scrypta.get('/balance/' + app.address)
-                let minamount = 0.001
+                let minamount = 0.002
                 let autorizations = 0.002 * app.pollPreAuthorized.length
                 minamount += autorizations
                 if(balance.balance > minamount){

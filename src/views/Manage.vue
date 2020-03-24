@@ -37,7 +37,7 @@
                   <br>
                   <h3 class="title is-3">Invalidate poll</h3>
                   This will delete this poll from the dApp and no one will be able to find or vote inside it, please use it at your own risk.<br><br>
-                  <b-button v-on:click="invalidatePoll" type="is-danger" size="is-large">INVALIDATE</b-button>
+                  <b-button v-on:click="invalidatePoll" type="is-danger" size="is-medium">INVALIDATE</b-button>
                 </b-tab-item>
 
             </b-tabs>
