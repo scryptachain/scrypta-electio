@@ -55,7 +55,8 @@
             return {
                 scrypta: new ScryptaCore(true),
                 isJoined: false,
-                isEnded: false
+                isEnded: false,
+                wallet: {}
             }
         },
         mounted(){
@@ -63,12 +64,14 @@
             app.checkJoinPoll()
         },
         methods: {
-            checkJoinPoll(poll){
+            async checkJoinPoll(){
                 const app = this
+                let identity = await app.scrypta.returnIdentity(app.address)
+                app.wallet = identity
                 app.scrypta.post('/received',
-                { address: poll.address })
+                { address: app.poll.address })
                 .then(function (response) {
-                    var received = response.data.data
+                    var received = response.data
                     var found = false
                     for(var i=0; i < received.length; i++){
                         var tx = received[i]
@@ -102,7 +105,7 @@
                                     app.isUploading = true
                                     let send = await app.scrypta.post('/send',{
                                         from: app.address,
-                                        to: app.pollAddress,
+                                        to: app.poll.address,
                                         amount: 0.0001,
                                         private_key: key.prv,
                                         message: 'poll://AUTHREQUEST:' + identity.rsa.pub

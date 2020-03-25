@@ -31,11 +31,17 @@
                   {{ authorized }}
                   <br><br>
                   <h3 class="title is-3">Authorization requests</h3>
-                  {{ authorized }}
+                  {{ requestedCards }}
                 </b-tab-item>
 
                 <b-tab-item label="Manage">
                   <br>
+                  <div v-if="dna.type !== 'PUBLIC'">
+                    <h3 class="title is-3">Start poll</h3>
+                    This will send all the vote cards to all the participants.<br><br>
+                    <b-button v-on:click="startPoll" type="is-danger" size="is-medium">START NOW</b-button>
+                    <br><br>
+                  </div>
                   <h3 class="title is-3">Invalidate poll</h3>
                   This will delete this poll from the dApp and no one will be able to find or vote inside it, please use it at your own risk.<br><br>
                   <b-button v-on:click="invalidatePoll" type="is-danger" size="is-medium">INVALIDATE</b-button>
@@ -194,6 +200,9 @@
             }
         })
       },
+      startPoll(){
+
+      },
       fetchStats(){
         const app = this
         
@@ -214,8 +223,11 @@
                 app.votes[exp[2]] = 1
               }
             }
-            if(exp[0] === 'poll' && exp[1] === '//AUTHREQUEST'){
+            if(exp[0] === 'poll' && exp[1].indexOf('AUTHREQUEST') !== -1){
               app.requestedCards.push(tx.sender)
+            }
+            if(exp[0] === 'poll' && exp[1].indexOf('VOTECARD') !== -1 && tx.sender === app.dna.owner){
+              app.authorized.push(tx.sender)
             }
             if(exp[0] === 'poll' && exp[1] === '//AUTH'){
               if(exp[2] !== undefined && exp[2] !== 'undefined'){
