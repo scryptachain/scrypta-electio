@@ -79,18 +79,18 @@
           </div>
           <br>
           <div class="text-left" v-if="pollType === 'PUBLIC'">
-            <b-message title="Please pay attention" type="is-danger" aria-close-label="Close message">
+            <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
               This poll will be PUBLIC, anyone will see it in the platform and can send a vote.
             </b-message>
           </div>
           <div class="text-left" v-if="pollType === 'AUTHORIZED'">
-            <b-message title="Please pay attention" type="is-danger" aria-close-label="Close message">
+            <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
               This poll will be PUBLIC but you will authorize every account before it can send the vote.<br>
               You can even pre-authorize the accounts, if you're doing that please make double checks and include anyone because no one will be able to request an authorization later.
             </b-message>
           </div>
           <div class="text-left" v-if="pollType === 'SECRET'">
-            <b-message title="Please pay attention" type="is-danger" aria-close-label="Close message">
+            <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
               This poll will be PRIVATE and ENCRYPTED on the blockchain and you have to pre-authorize the addresses.
             </b-message>
           </div>
@@ -220,14 +220,8 @@
                       type: 'is-danger'
                   })
                 }else{
-                  valid = false
-                  app.$buefy.toast.open({
-                      message: 'This is an empty address!',
-                      type: 'is-danger'
-                  })
+                  validAddresses.push(address)
                 }
-              }else{
-                validAddresses.push(address)
               }
             }
           }

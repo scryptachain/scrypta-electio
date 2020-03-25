@@ -28,19 +28,49 @@
                 <b-tab-item v-if="dna.type !== 'PUBLIC'" label="Authorizations">
                   <br>
                   <h3 class="title is-3">Authorized accounts</h3>
-                  {{ authorized }}
-                  <br><br>
-                  <h3 class="title is-3">Authorization requests</h3>
-                  {{ requestedCards }}
+                  <div v-if="authorized.length > 0">
+                    <div class="card" v-for="authorizedaddress in authorized" v-bind:key="authorizedaddress">
+                      <div class="card-content">
+                        <div class="content">
+                          <v-gravatar :email="authorizedaddress" style="width:25px; height:25px; float:left; margin-right:20px;" />
+                          {{ authorizedaddress }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="authorized.length === 0">
+                    No authorized accounts, please go to "Manage" and start the poll.
+                  </div>
                 </b-tab-item>
 
                 <b-tab-item label="Manage">
                   <br>
-                  <div v-if="dna.type !== 'PUBLIC'">
+                  <div v-if="dna.type !== 'PUBLIC' && !isStarted">
                     <h3 class="title is-3">Start poll</h3>
-                    This will send all the vote cards to all the participants.<br><br>
-                    <b-button v-on:click="startPoll" type="is-danger" size="is-medium">START NOW</b-button>
-                    <br><br>
+                    <div v-if="Object.keys(pubkeys).length > 0">
+                      <div v-if="authorized.length === 0">
+                        This will send the voting cards to all the selected participants. You will not be able to accept other participants after the start.<br>
+                        <div class="card" v-for="requestedcard in requestedCards" v-bind:key="requestedcard">
+                          <div class="card-content">
+                            <div class="content">
+                              <v-gravatar :email="requestedcard" style="width:25px; height:25px; float:left; margin-right:20px;" />
+                              {{ requestedcard }}
+                              <b-checkbox v-model="accepted[requestedcard]" style="float:right"></b-checkbox>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div v-if="authorized.length > 0">
+                        This will send the voting cards to all pre-authorized participants.
+                      </div><br>
+                      <b-button v-if="!isStarting" v-on:click="startPoll" type="is-danger" size="is-medium">START NOW</b-button>
+                      <div v-if="isStarting"><br>Starting poll, please wait...</div>
+                      <br><br>
+                    </div>
+                    <div v-if="Object.keys(pubkeys).length === 0">
+                      No one requested the access, nothing to start now.
+                    </div>
+                    <hr>
                   </div>
                   <h3 class="title is-3">Invalidate poll</h3>
                   This will delete this poll from the dApp and no one will be able to find or vote inside it, please use it at your own risk.<br><br>
@@ -58,6 +88,7 @@
 <script>
   const ScryptaCore = require('@scrypta/core')
   const moment = require('moment')
+  const NodeRSA = require('node-rsa')
 
   export default {
     name: 'Manage',
@@ -68,12 +99,16 @@
         wallet: '',
         pollAddress: '',
         isLoading: true,
+        isStarting: false,
+        isStarted: false,
         isDecrypted: true,
         poll: {},
         authorized: {},
         dna: {},
         results: {},
         requestedCards: [],
+        pubkeys: [],
+        accepted: {},
         votes: []
       }
     },
@@ -95,7 +130,6 @@
           if(app.dna.type === "SECRET"){
             app.isDecrypted = false
             if(localStorage.getItem('pollPwD') !== null && localStorage.getItem('pollPwD') !== ''){
-              console.log(localStorage.getItem('pollPwD'))
               let decrypted = await app.scrypta.decryptData(app.poll, localStorage.getItem('pollPwD'))
               localStorage.setItem('pollPwD','')
 
@@ -183,7 +217,7 @@
                   dapp_address: app.pollAddress,
                   private_key: privkey
                 })
-                if(send.success !== undefined && send.success === false && send.txid !== null && send.txid.length === 64){  
+                if(send.success !== undefined && send.success === true && send.txid !== null && send.txid.length === 64){  
                   app.$buefy.toast.open({
                     message: 'Poll ended correctly, will disappear soon!',
                     type: 'is-success'
@@ -200,8 +234,142 @@
             }
         })
       },
-      startPoll(){
-
+      shuffle(array) {
+          for (var i = array.length - 1; i > 0; i--) {
+              var j = Math.floor(Math.random() * (i + 1));
+              var temp = array[i];
+              array[i] = array[j];
+              array[j] = temp;
+          }
+          return array
+      },
+      async startPoll(){
+        const app = this
+        if(!app.isStarted){
+          let selected = []
+          for(let x in app.accepted){
+            if(app.accepted[x]){
+              selected.push(x)
+            }
+          }
+          if(selected.length > 0){
+            app.isStarting = true
+            let balance = await app.scrypta.get('/balance/' + app.address)
+            let amountneeded = 0.001
+            let amountvotingcards = 0.001 * selected.length
+            amountneeded += amountvotingcards
+            let pubkeys = app.shuffle(app.pubkeys)
+            if(balance.balance >= amountneeded){
+              app.$buefy.dialog.prompt({
+                  message: `Enter wallet password`,
+                  inputAttrs: {
+                      type: 'password'
+                  },
+                  trapFocus: true,
+                  onConfirm: async (password) => {
+                    let walletstore = app.wallet.wallet
+                    let key = await app.scrypta.readKey(password,walletstore)
+                    if(key !== false){
+                      app.isUploading = true
+                      let success = true
+                      for(let x in selected){
+                        let pubkey = ''
+                        for(let y in pubkeys){
+                          if(pubkeys[y].address === selected[x]){
+                            pubkey = pubkeys[y].key
+                          }
+                        }
+                        if(pubkey.length > 0){
+                          let newaddress = await app.scrypta.createAddress('000000', false)
+                          const rsakey = new NodeRSA(pubkey)
+                          let encrypted = rsakey.encrypt(newaddress.pub + ',' + newaddress.prv, 'base64')
+                          let sendcard = false
+                          let yy = 0
+                          while(sendcard === false){
+                            let send = await app.scrypta.post('/send',{
+                              from: app.address,
+                              to: app.pollAddress,
+                              amount: 0.0001,
+                              private_key: key.prv,
+                              message: 'poll://AUTH:' +  selected[x] + ':' + encrypted
+                            })
+                            if(send.data.txid !== undefined && send.data.txid.length === 64){
+                              sendcard = true
+                            }
+                            if(yy > 19){
+                              success = false
+                              sendcard = true
+                            }
+                            yy++
+                          }
+                        }else{
+                          success = false
+                        }
+                      }
+                      if(success === true){
+                        let sendstart = false
+                        let yy = 0
+                        while(sendstart === false){
+                          let send = await app.scrypta.post('/send',{
+                            from: app.address,
+                            to: app.pollAddress,
+                            amount: 0.0001,
+                            private_key: key.prv,
+                            message: 'poll://START'
+                          })
+                          if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){
+                            sendstart = true
+                          }
+                          if(yy > 19){
+                            success = false
+                            sendstart = true
+                          }
+                          yy++
+                        }
+                        if(success === true){
+                          app.$buefy.toast.open({
+                            message: 'Poll started correctly, please wait at least 2 minutes!',
+                            type: 'is-success'
+                          })
+                          app.isStarted = true
+                        }else{
+                          app.$buefy.toast.open({
+                            message: 'Something goes wrong!',
+                            type: 'is-danger'
+                          })
+                        }
+                      }
+                      app.isStarting = false
+                    }else{
+                      app.isStarting = false
+                      app.$buefy.toast.open({
+                        message: 'Wrong password!',
+                        type: 'is-danger'
+                      })
+                    }
+                  }
+              })
+            }else{
+              app.$buefy.toast.open({
+                message: 'You need at least '+ amountneeded +' LYRA, you have ' + balance.balance + ' LYRA!',
+                type: 'is-danger'
+              })
+              app.isStarting = false
+            }
+          }else{
+            app.$buefy.toast.open({
+              message: 'You must accept at least 1 address!',
+              type: 'is-danger'
+            })
+            app.isStarting = false
+          }
+        }else{
+          app.$buefy.toast.open({
+            message: 'This poll has started yet!',
+            type: 'is-danger'
+          })
+          app.isStarting = false
+        }
       },
       fetchStats(){
         const app = this
@@ -215,6 +383,12 @@
           for(let i in txs){
             var tx=txs[i]
             var exp = tx.data.split(':')
+            if(exp[0] === 'poll' && exp[1] === '//START'){
+              if(tx.sender === app.dna.owner){
+                app.isStarted = true
+              }
+            }
+
             if(exp[0] === 'poll' && exp[1] === '//VOTE'){
               app.voted = exp[2]
               if(app.votes[exp[2]]){
@@ -223,11 +397,13 @@
                 app.votes[exp[2]] = 1
               }
             }
-            if(exp[0] === 'poll' && exp[1].indexOf('AUTHREQUEST') !== -1){
+            if(exp[0] === 'poll' && exp[1].indexOf('AUTHREQUEST') !== -1 && app.dna.type === 'AUTHORIZED'){
               app.requestedCards.push(tx.sender)
-            }
-            if(exp[0] === 'poll' && exp[1].indexOf('VOTECARD') !== -1 && tx.sender === app.dna.owner){
-              app.authorized.push(tx.sender)
+              app.pubkeys.push({
+                address: tx.sender,
+                key: exp[2]
+              })
+              app.accepted[tx.sender] = true
             }
             if(exp[0] === 'poll' && exp[1] === '//AUTH'){
               if(exp[2] !== undefined && exp[2] !== 'undefined'){

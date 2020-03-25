@@ -75,7 +75,8 @@
                     var found = false
                     for(var i=0; i < received.length; i++){
                         var tx = received[i]
-                        if(tx.sender === app.address){
+                        var exp = tx.data.split(':')
+                        if(exp[3] !== undefined && exp[2] === app.address && exp[1] === '//AUTH'){
                             found = true
                         }
                     }

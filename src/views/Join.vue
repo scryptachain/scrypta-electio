@@ -36,6 +36,7 @@
 <script>
   const ScryptaCore = require('@scrypta/core')
   const moment = require('moment')
+  const NodeRSA = require('node-rsa')
 
   export default {
     name: 'Manage',
@@ -57,7 +58,7 @@
         authorized: {},
         dna: {},
         results: {},
-        requestedCards: [],
+        voteCard: '',
         votes: []
       }
     },
@@ -128,25 +129,18 @@
                 }else{
                   app.votes[exp[2]] = 1
                 }
-                if(tx.sender === app.address){
+
+                if(exp[3] !== undefined && exp[2] === app.address && exp[1] === '//AUTH'){
+                  app.canVote = true
+                  app.voteCard = exp[3]
+                }
+                if(tx.sender === app.address && exp[1] === '//VOTE'){
                   app.userVoted = true
                   app.userVote = exp[2]
                 }
               }
-              if(exp[0] === 'poll' && exp[1] === '//AUTHREQUEST'){
-                app.requestedCards.push(tx.sender)
-              }
-              if(exp[0] === 'poll' && exp[1] === '//AUTH'){
-                if(exp[2] !== undefined && exp[2] !== 'undefined'){
-                  app.authorized.push(exp[2])
-                }
-              }
             }
           })
-
-          if(app.dna !== 'PUBLIC'){
-            // TODO: CHECK FOR VOTE CARD
-          }
       },
       decryptPoll(){
         const app = this
@@ -189,46 +183,65 @@
       },
       async votePoll(index){
         const app = this
-        let voteCard = app.address
-        let balance = await app.scrypta.get('/balance/' + voteCard)
-        if(balance.balance >= 0.0011){
-          app.$buefy.dialog.prompt({
-            message: `Enter poll passphrase`,
-            inputAttrs: {
-                type: 'password'
-            },
-            trapFocus: true,
-            onConfirm: async (password) => {
-              let walletstore = app.wallet.wallet
-              let key = await app.scrypta.readKey(password,walletstore)
-              if(key !== false){
-                app.isUploading = true
-                let send = await app.scrypta.post('/send',{
-                  from: app.address,
-                  to: app.pollAddress,
-                  amount: 0.0001,
-                  private_key: key.prv,
-                  message: 'poll://VOTE:' + index
-                })
-
-                if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
-                  app.$buefy.toast.open({
-                    message: 'Voted sent correctly, you will see the results when the poll is ended!',
-                    type: 'is-success'
+        let voteCard = false
+        if(app.dna.type === 'PUBLIC'){
+          voteCard = app.address
+        }else if(app.voteCard !== ''){
+          let encrypted = app.voteCard
+          // TODO: DECRYPT CARD AND USE IT
+        }
+        if(voteCard !== false){
+          let balance = await app.scrypta.get('/balance/' + voteCard)
+          if(balance.balance >= 0.0011){
+            app.$buefy.dialog.prompt({
+              message: `Enter poll passphrase`,
+              inputAttrs: {
+                  type: 'password'
+              },
+              trapFocus: true,
+              onConfirm: async (password) => {
+                let walletstore = app.wallet.wallet
+                let key = await app.scrypta.readKey(password,walletstore)
+                if(key !== false){
+                  app.isUploading = true
+                  let send = await app.scrypta.post('/send',{
+                    from: app.address,
+                    to: app.pollAddress,
+                    amount: 0.0001,
+                    private_key: key.prv,
+                    message: 'poll://VOTE:' + index
                   })
+
+                  if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
+                    app.$buefy.toast.open({
+                      message: 'Voted sent correctly, you will see the results when the poll is ended!',
+                      type: 'is-success'
+                    })
+                  }else{
+                    app.$buefy.toast.open({
+                      message: 'Something goes wrong!',
+                      type: 'is-danger'
+                    })
+                  }
+                  app.isUploading = false
                 }else{
                   app.$buefy.toast.open({
-                    message: 'Something goes wrong!',
+                    message: 'Wrong password!',
                     type: 'is-danger'
                   })
+                  app.isUploading = false
                 }
-                app.isUploading = false
               }
-            }
-          })
+            })
+          }else{
+            app.$buefy.toast.open({
+                message: "You need at least 0.0011 LYRA, you have " + balance.balance + " LYRA!",
+                type: 'is-danger'
+            })
+          }
         }else{
           app.$buefy.toast.open({
-              message: "You need at least 0.0011 LYRA, you have " + balance.balance + " LYRA!",
+              message: "You have no vote card!",
               type: 'is-danger'
           })
         }
