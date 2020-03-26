@@ -210,7 +210,7 @@
           if(key !== false){
             app.isUpdating = true
             setTimeout(async function(){
-              let res = await app.scrypta.createRSAKeys(app.address+':'+app.wallet.wallet, app.password)
+              let res = await app.scrypta.createRSAKeys(app.wallet.wallet, app.password)
               if(res !== false){
                 let identity = await app.scrypta.returnIdentity(app.address)
                 app.needsRSA = false
