@@ -26,6 +26,9 @@
                 <div v-if="isJoined && poll.data.dna.owner !== address">
                     <b-button type="is-success" v-on:click="decryptPoll()" class="float-btn">Enter</b-button>
                 </div>
+                <div v-if="poll.data.dna.votetype === 'PUBLIC' && poll.data.dna.owner !== address">
+                    <b-button type="is-success" v-on:click="decryptPoll()" class="float-btn">Enter</b-button>
+                </div>
                 <div v-if="isEnded">
                     <a :href="'/#/results/' + poll.uuid"><b-button type="is-primary" class="float-btn">Show results</b-button></a>
                 </div>

@@ -65,13 +65,38 @@
 
                 <b-tab-item label="Manage">
                   <br>
-                  <div v-if="dna.votetype === 'SECRET' && !isStarted">
+                  <div v-if="(dna.votetype === 'SECRET'  || dna.type === 'AUTHORIZED') && !isStarted">
                     <h3 class="title is-3">Start poll</h3>
-                    <div v-if="Object.keys(pubkeys).length > 0">
-                      <div v-if="dna.votetype === 'SECRET'">
-                        This will send the voting cards to all the selected participants. You will not be able to accept other participants after the start.<br>
+                    <div v-if="dna.votetype === 'SECRET'">
+                      <div v-if="Object.keys(pubkeys).length > 0">
+                        <div v-if="dna.votetype === 'SECRET'">
+                          This will send the voting cards to all the selected participants. You will not be able to accept other participants after the start.<br>
+                        </div>
+                        <div class="card" v-for="requestedcard in requestedCards" v-bind:key="requestedcard">
+                          <div class="card-content">
+                            <div class="content">
+                              <v-gravatar :email="requestedcard" style="width:25px; height:25px; float:left; margin-right:20px;" />
+                              {{ requestedcard }}
+                              <b-checkbox v-model="accepted[requestedcard]" style="float:right"></b-checkbox>
+                            </div>
+                          </div>
+                        </div>
+                        <br>
+                        <b-message v-if="authorized.length > 0 && authorized.length !== Object.keys(pubkeys).length && dna.type === 'SECRET'" title="Attention please!" type="is-danger" aria-close-label="Close message">
+                          You can emit {{ Object.keys(pubkeys).length }} vote cards but you have pre-authorized {{ authorized.length }} addresses.
+                        </b-message>
+                        <b-button v-if="!isStarting" v-on:click="startPoll" type="is-danger" size="is-medium">START NOW</b-button>
+                        <div v-if="isStarting"><br>Starting poll, please wait...</div>
+                        <br><br>
                       </div>
-                      <div class="card" v-for="requestedcard in requestedCards" v-bind:key="requestedcard">
+                      <div v-if="Object.keys(pubkeys).length === 0">
+                        No one requested the access, nothing to start now.
+                      </div>
+                    </div>
+                    <div v-if="dna.type === 'AUTHORIZED' && dna.votetype === 'PUBLIC'">
+                      This will send an ok flag the selected participants so they can send the vote. You will not be able to accept other participants after the start.<br>
+                      <br>
+                      <div class="card" v-for="requestedcard in requestedAuth" v-bind:key="requestedcard">
                         <div class="card-content">
                           <div class="content">
                             <v-gravatar :email="requestedcard" style="width:25px; height:25px; float:left; margin-right:20px;" />
@@ -79,17 +104,9 @@
                             <b-checkbox v-model="accepted[requestedcard]" style="float:right"></b-checkbox>
                           </div>
                         </div>
-                      </div>
-                      <br>
-                      <b-message v-if="authorized.length > 0 && authorized.length !== Object.keys(pubkeys).length && dna.type === 'SECRET'" title="Attention please!" type="is-danger" aria-close-label="Close message">
-                        You can emit {{ Object.keys(pubkeys).length }} vote cards but you have pre-authorized {{ authorized.length }} addresses.
-                      </b-message>
+                      </div><br>
                       <b-button v-if="!isStarting" v-on:click="startPoll" type="is-danger" size="is-medium">START NOW</b-button>
                       <div v-if="isStarting"><br>Starting poll, please wait...</div>
-                      <br><br>
-                    </div>
-                    <div v-if="Object.keys(pubkeys).length === 0">
-                      No one requested the access, nothing to start now.
                     </div>
                     <hr>
                   </div>
@@ -128,6 +145,7 @@
         dna: {},
         results: {},
         requestedCards: [],
+        requestedAuth: [],
         sentCards: [],
         pubkeys: [],
         accepted: {},
@@ -298,6 +316,7 @@
                     if(key !== false){
                       app.isUploading = true
                       let success = true
+                      
                       if(app.dna.votetype === 'SECRET'){
                         for(let x in selected){
                           let pubkey = ''
@@ -352,6 +371,31 @@
                           }
                         }
                       }
+
+                      if(app.dna.votetype === 'PUBLIC'){
+                        for(let x in selected){
+                          let yy = 0
+                          let sendcard = false
+                          while(sendcard === false){
+                            let send = await app.scrypta.post('/send',{
+                              from: app.address,
+                              to: app.pollAddress,
+                              amount: 0.0001,
+                              private_key: key.prv,
+                              message: 'poll://AUTH' +  selected[x]
+                            })
+                            if(send.data.txid !== undefined && send.data.txid.length === 64){
+                              sendcard = true
+                            }
+                            if(yy > 19){
+                              success = false
+                              sendcard = true
+                            }
+                            yy++
+                          }
+                        }
+                      }
+
                       if(success === true){
                         let sendstart = false
                         // WRITING VOTING START
@@ -455,6 +499,11 @@
               })
               app.accepted[tx.sender] = true
             }
+          }
+          
+          if(app.dna.votetype === 'PUBLIC' && exp[1] === '//AUTHREQUEST' && app.dna.type === 'AUTHORIZED'){
+            app.requestedAuth.push(tx.sender)
+            app.accepted[tx.sender] = true
           }
           if(exp[0] === 'poll' && exp[1] === '//AUTH'){
             if(exp[2] !== undefined && exp[2] !== 'undefined' && app.sentCards.indexOf(exp[2]) === -1){
