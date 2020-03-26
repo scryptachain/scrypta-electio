@@ -205,25 +205,34 @@
       async updateUser(){
         const app = this
         if(app.password !== ''){
-          app.isUpdating = true
-          setTimeout(async function(){
-            let res = await app.scrypta.createRSAKeys(app.address+':'+app.wallet.wallet, app.password)
-            if(res !== false){
-              let identity = await app.scrypta.returnIdentity(app.address)
-              app.needsRSA = false
-              app.wallet = identity
-              app.showCreateModal = false
-              app.password = ''
-              app.passwordrepeat = ''
-              app.isUpdating = false
-            }else{
-              app.isUpdating = false
-              app.$buefy.toast.open({
-                  message: 'Password is wrong!',
-                  type: 'is-danger'
-              })
-            }
-          }, 500)
+          let walletstore = app.wallet.wallet
+          let key = await app.scrypta.readKey(app.password,walletstore)
+          if(key !== false){
+            app.isUpdating = true
+            setTimeout(async function(){
+              let res = await app.scrypta.createRSAKeys(app.address+':'+app.wallet.wallet, app.password)
+              if(res !== false){
+                let identity = await app.scrypta.returnIdentity(app.address)
+                app.needsRSA = false
+                app.wallet = identity
+                app.showCreateModal = false
+                app.password = ''
+                app.passwordrepeat = ''
+                app.isUpdating = false
+              }else{
+                app.isUpdating = false
+                app.$buefy.toast.open({
+                    message: 'Password is wrong!',
+                    type: 'is-danger'
+                })
+              }
+            }, 500)
+          }else{
+            app.$buefy.toast.open({
+              message: 'Wrong password!',
+              type: 'is-danger'
+            })
+          }
         }else{
           app.$buefy.toast.open({
               message: 'Write a password first!',

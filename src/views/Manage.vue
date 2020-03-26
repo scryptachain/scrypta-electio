@@ -313,7 +313,6 @@
                             let sendcard = false
                             // WRITING VOTING CARD TO POLL ADDRESS
                             let yy = 0
-                            console.log('SENDING VOTING CARD')
                             while(sendcard === false){
                               let send = await app.scrypta.post('/send',{
                                 from: app.address,
@@ -333,7 +332,6 @@
                             }
                             let sendamountneeded = false
                             // SENDING 0.0011 LYRA to voting card
-                            console.log('SENDING SENDING AMOUNT CARD')
                             yy = 0
                             while(sendamountneeded === false){
                               let send = await app.scrypta.post('/send',{
@@ -357,7 +355,6 @@
                       if(success === true){
                         let sendstart = false
                         // WRITING VOTING START
-                        console.log('SENDING START')
                         let yy = 0
                         while(sendstart === false){
                           let send = await app.scrypta.post('/send',{
