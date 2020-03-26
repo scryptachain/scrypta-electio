@@ -3,6 +3,26 @@
     <div class="container">
         <h1>Create new poll</h1>
         <hr>
+        <div class="text-left" v-if="pollType === 'PUBLIC'">
+          <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
+            This poll will be <b>PUBLIC</b>, anyone will see it in the platform and can send a vote. This vote will be <b>PUBLIC</b> by default.
+          </b-message>
+        </div>
+        <div class="text-left" v-if="pollType === 'AUTHORIZED'">
+          <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
+            This poll will be <b>PUBLIC</b> but you will authorize every account before it can send the vote.<br>
+            The vote of this poll will be: <b>{{ pollVoteType }}</b>. 
+            <span v-if="pollVoteType === 'SECRET'">You will send an encrypted vote card to each autorized or pre-authorized address.</span>
+          </b-message>
+        </div>
+        <div class="text-left" v-if="pollType === 'SECRET'">
+          <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
+            This poll will be <b>PRIVATE</b> and <b>ENCRYPTED</b> on the blockchain and you have to pre-authorize the addresses.<br>
+            The vote of this poll will be: <b>{{ pollVoteType }}</b>.
+            <span v-if="pollVoteType === 'SECRET'">You will send an encrypted vote card to each autorized or pre-authorized address.</span>
+          </b-message>
+        </div>
+        <br><br>
         <div class="text-left">
           <div class="columns">
             <div class="column">
@@ -12,9 +32,21 @@
             </div>
             <div class="column">
               <b-field label="Poll Visibility">
-                <b-select style="width:100%" v-model="pollType" placeholder="Select a type of visibility">
+                <b-select style="width:100%" v-model="pollType" placeholder="Select a type for the vote">
                     <option
                         v-for="option in types"
+                        :value="option"
+                        :key="option">
+                        {{ option }}
+                    </option>
+                </b-select>
+              </b-field>
+            </div>
+            <div class="column" v-if="pollType !== 'PUBLIC'">
+              <b-field label="Vote Visibility">
+                <b-select style="width:100%" v-model="pollVoteType" placeholder="Select a type of visibility for the vote">
+                    <option
+                        v-for="option in votetypes"
                         :value="option"
                         :key="option">
                         {{ option }}
@@ -77,23 +109,7 @@
               </li>
             </ul>
           </div>
-          <br>
-          <div class="text-left" v-if="pollType === 'PUBLIC'">
-            <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
-              This poll will be PUBLIC, anyone will see it in the platform and can send a vote.
-            </b-message>
-          </div>
-          <div class="text-left" v-if="pollType === 'AUTHORIZED'">
-            <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
-              This poll will be PUBLIC but you will authorize every account before it can send the vote.<br>
-              You can even pre-authorize the accounts, if you're doing that please make double checks and include anyone because no one will be able to request an authorization later.
-            </b-message>
-          </div>
-          <div class="text-left" v-if="pollType === 'SECRET'">
-            <b-message title="Attention please!" type="is-danger" aria-close-label="Close message">
-              This poll will be PRIVATE and ENCRYPTED on the blockchain and you have to pre-authorize the addresses.
-            </b-message>
-          </div>
+
           <div class="text-left" v-if="pollType === 'AUTHORIZED' || pollType === 'SECRET'">
             <br>
             <div class="label">
@@ -140,8 +156,10 @@
         pollName: '',
         pollQuestion: "",
         pollType: "PUBLIC",
+        pollVoteType: "PUBLIC",
         pollSecretKey: '',
         types: ["PUBLIC","AUTHORIZED","SECRET"],
+        votetypes: ["PUBLIC","SECRET"],
         pollStartDate: new Date(),
         pollStartTime: new Date(),
         pollEndDate: new Date(),
@@ -168,6 +186,13 @@
       app.pollEndDate = date
     },
     methods: {
+      parseMonth(month){
+        month = parseInt(month) + 1
+        if(parseInt(month) < 10){
+          month = "0" + month.toFixed(0)
+        }
+        return month
+      },
       addAnswer(){
         this.pollAnswers.push({
           answer: ""
@@ -205,6 +230,9 @@
       async createPoll(){
         const app = this
         let valid = true
+        if(app.pollType === 'PUBLIC'){
+          app.pollVoteType = 'PUBLIC'
+        }
         if(app.pollPreAuthorized.length > 0){
           app.isChecking = true
           let validAddresses = []
@@ -264,16 +292,28 @@
                     pollPubKey = response.key
                     pollPrivateKey = response.prv
                     
-                    let send = await app.scrypta.post('/send',{
-                      from: app.address,
-                      to: response.pub,
-                      amount: minamount,
-                      private_key: key.prv
-                    })
+                    let sendsuccess = false
+                    let y = 0
+                    let send
+                    while(!sendsuccess){
+                      send = await app.scrypta.post('/send',{
+                        from: app.address,
+                        to: response.pub,
+                        amount: minamount,
+                        private_key: key.prv
+                      })
+                      if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){
+                        sendsuccess = true
+                      }
+                      if(y > 9){
+                        sendsuccess = true
+                      }
+                    }
 
-                    if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
-                      let startDate = app.pollStartDate.getFullYear() + '-' + app.pollStartDate.getMonth() + '-' + app.pollStartDate.getDate()
-                      let endDate = app.pollEndDate.getFullYear() + '-' + app.pollEndDate.getMonth() + '-' + app.pollEndDate.getDate()
+                    if(sendsuccess && send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
+                      
+                      let startDate = app.pollStartDate.getFullYear() + '-' + app.parseMonth(app.pollStartDate.getMonth()) + '-' + app.pollStartDate.getDate()
+                      let endDate = app.pollEndDate.getFullYear() + '-' + app.parseMonth(app.pollEndDate.getMonth()) + '-' + app.pollEndDate.getDate()
                       let startTime = app.pollStartTime.getHours() + ':' + app.pollStartDate.getMinutes()
                       let endTime = app.pollEndTime.getHours() + ':' + app.pollEndTime.getMinutes()
                       
@@ -284,7 +324,8 @@
                           pubkey: pollPubKey,
                           privkey: pollPrivateKeyEnc,
                           owner: app.address,
-                          type: app.pollType
+                          type: app.pollType,
+                          votetype: app.pollVoteType
                         },
                         poll: {
                           name: app.pollName,

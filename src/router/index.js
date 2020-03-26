@@ -25,9 +25,9 @@ const routes = [
     component: () => import('../views/Manage.vue')
   },
   {
-    path: '/join/:uuid',
-    name: 'Join',
-    component: () => import('../views/Join.vue')
+    path: '/poll/:uuid',
+    name: 'poll',
+    component: () => import('../views/Poll.vue')
   }
 ]
 

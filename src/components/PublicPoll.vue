@@ -17,18 +17,18 @@
             </div>
             <div class="content">
                 <div v-if="poll.data.owner !== address">
-                    <div v-if="!isJoined && poll.data.dna.owner !== address && poll.data.dna.type === 'AUTHORIZED'">
+                    <div v-if="!isJoined && poll.data.dna.owner !== address && poll.data.dna.votetype === 'SECRET'">
                         <b-button v-on:click="joinRequest()" type="is-primary" class="float-btn">Join request</b-button>
                     </div>
-                    <div v-if="(isJoined || poll.data.dna.type === 'PUBLIC') && poll.data.dna.owner !== address">
-                        <a :href="'/#/join/' + poll.uuid"><b-button type="is-success" class="float-btn">Enter</b-button></a>
-                    </div>
-                    <div v-if="poll.data.dna.owner === address && !isEnded">
-                        <a :href="'/#/manage/' + poll.uuid"><b-button type="is-primary" class="float-btn">Manage</b-button></a>
+                    <div v-if="(isJoined || poll.data.dna.votetype === 'PUBLIC') && poll.data.dna.owner !== address">
+                        <a :href="'/#/poll/' + poll.uuid"><b-button type="is-success" class="float-btn">Enter</b-button></a>
                     </div>
                     <div v-if="isEnded">
-                        <a :href="'/#/results/' + poll.uuid"><b-button type="is-primary" class="float-btn">Show results</b-button></a>
+                        <a :href="'/#/poll/' + poll.uuid"><b-button type="is-primary" class="float-btn">Show results</b-button></a>
                     </div>
+                </div>
+                <div v-if="poll.data.dna.owner === address && !isEnded">
+                    <a :href="'/#/manage/' + poll.uuid"><b-button type="is-primary" class="float-btn">Manage</b-button></a>
                 </div>
             </div>
         </div>
@@ -47,6 +47,7 @@
 </style>
 <script>
     const ScryptaCore = require('@scrypta/core')
+    const moment = require('moment')
     
     export default {
         name: 'publicpoll',
@@ -62,22 +63,37 @@
         mounted(){
             const app = this
             app.checkJoinPoll()
+            if(app.poll.data.dna.type !== 'SECRET'){
+                let end = moment(app.poll.data.poll.end_date + 'T' + app.poll.data.poll.end_time + ':00')
+                if(moment().isAfter(end)){
+                    app.isEnded = true
+                }
+            }
         },
         methods: {
             async checkJoinPoll(){
                 const app = this
                 let identity = await app.scrypta.returnIdentity(app.address)
                 app.wallet = identity
+                let authorizedCount = 0
+                let votesCount = 0
                 app.scrypta.post('/received',
-                { address: app.poll.address })
+                    { address: app.poll.address })
                 .then(function (response) {
                     var received = response.data
                     var found = false
                     for(var i=0; i < received.length; i++){
                         var tx = received[i]
                         var exp = tx.data.split(':')
-                        if(exp[3] !== undefined && exp[2] === app.address && exp[1] === '//AUTH'){
+                        if(exp[3] !== undefined && exp[2] === app.address && exp[1] === '//AUTH' && tx.sender === app.poll.data.dna.owner){
                             found = true
+                            authorizedCount++
+                        }
+                        if(exp[0] === 'poll' && exp[1] === '//VOTE'){
+                            votesCount++
+                        }
+                        if(authorizedCount === votesCount && authorizedCount > 0 && votesCount > 0 && app.poll.data.dna.type !== 'PUBLIC'){
+                            app.isEnded = true
                         }
                     }
                     if(found === true){

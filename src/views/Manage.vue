@@ -15,7 +15,8 @@
                   <br>
                   <h3 class="title is-3">{{ poll.name }}</h3>
                   <b>Opened:</b> from {{ poll.start_date }} {{ poll.start_time }}:00 <b>till</b> {{ poll.end_date }} {{ poll.end_time }}:00<br>
-                  <b>Type:</b> {{ dna.type }}
+                  <b>Type:</b> {{ dna.type }}<br>
+                  <b>Vote type:</b> {{ dna.votetype }}
                   <hr>
                   <p>{{ poll.question }}</p>
                   <hr>
@@ -25,10 +26,17 @@
                   </ul>
                 </b-tab-item>
 
-                <b-tab-item v-if="dna.type !== 'PUBLIC'" label="Authorizations">
+                <b-tab-item label="Votes">
                   <br>
-                  <h3 class="title is-3">Authorized accounts</h3>
+                  <ul>
+                    <li v-for="(answer, index) in poll.answers" disabled class="title is-4" v-bind:key="answer.answer" style="margin: 0 10px;">{{ answer.answer }}: {{ votes[index] }}</li>
+                  </ul>
+                </b-tab-item>
+
+                <b-tab-item v-if="dna.votetype === 'SECRET'" label="Authorizations">
                   <div v-if="authorized.length > 0">
+                    <br>
+                    <h3 class="title is-3">Pre-Authorized accounts</h3>
                     <div class="card" v-for="authorizedaddress in authorized" v-bind:key="authorizedaddress">
                       <div class="card-content">
                         <div class="content">
@@ -38,31 +46,44 @@
                       </div>
                     </div>
                   </div>
-                  <div v-if="authorized.length === 0">
+                  <br>
+                  <h3 class="title is-3">Voting cards sent</h3>
+                  <div v-if="sentCards.length > 0">
+                    <div class="card" v-for="authorizedaddress in sentCards" v-bind:key="authorizedaddress">
+                      <div class="card-content">
+                        <div class="content">
+                          <v-gravatar :email="authorizedaddress" style="width:25px; height:25px; float:left; margin-right:20px;" />
+                          {{ authorizedaddress }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="authorized.length === 0 && sentCards.length === 0">
                     No authorized accounts, please go to "Manage" and start the poll.
                   </div>
                 </b-tab-item>
 
                 <b-tab-item label="Manage">
                   <br>
-                  <div v-if="dna.type !== 'PUBLIC' && !isStarted">
+                  <div v-if="dna.votetype === 'SECRET' && !isStarted">
                     <h3 class="title is-3">Start poll</h3>
                     <div v-if="Object.keys(pubkeys).length > 0">
-                      <div v-if="authorized.length === 0">
+                      <div v-if="dna.votetype === 'SECRET'">
                         This will send the voting cards to all the selected participants. You will not be able to accept other participants after the start.<br>
-                        <div class="card" v-for="requestedcard in requestedCards" v-bind:key="requestedcard">
-                          <div class="card-content">
-                            <div class="content">
-                              <v-gravatar :email="requestedcard" style="width:25px; height:25px; float:left; margin-right:20px;" />
-                              {{ requestedcard }}
-                              <b-checkbox v-model="accepted[requestedcard]" style="float:right"></b-checkbox>
-                            </div>
+                      </div>
+                      <div class="card" v-for="requestedcard in requestedCards" v-bind:key="requestedcard">
+                        <div class="card-content">
+                          <div class="content">
+                            <v-gravatar :email="requestedcard" style="width:25px; height:25px; float:left; margin-right:20px;" />
+                            {{ requestedcard }}
+                            <b-checkbox v-model="accepted[requestedcard]" style="float:right"></b-checkbox>
                           </div>
                         </div>
                       </div>
-                      <div v-if="authorized.length > 0">
-                        This will send the voting cards to all pre-authorized participants.
-                      </div><br>
+                      <br>
+                      <b-message v-if="authorized.length > 0 && authorized.length !== Object.keys(pubkeys).length && dna.type === 'SECRET'" title="Attention please!" type="is-danger" aria-close-label="Close message">
+                        You can emit {{ Object.keys(pubkeys).length }} vote cards but you have pre-authorized {{ authorized.length }} addresses.
+                      </b-message>
                       <b-button v-if="!isStarting" v-on:click="startPoll" type="is-danger" size="is-medium">START NOW</b-button>
                       <div v-if="isStarting"><br>Starting poll, please wait...</div>
                       <br><br>
@@ -103,10 +124,11 @@
         isStarted: false,
         isDecrypted: true,
         poll: {},
-        authorized: {},
+        authorized: [],
         dna: {},
         results: {},
         requestedCards: [],
+        sentCards: [],
         pubkeys: [],
         accepted: {},
         votes: []
@@ -124,7 +146,10 @@
       if(response.data[0] !== undefined){
         app.poll = response.data[0].data.poll
         app.dna = response.data[0].data.dna
-        app.authorized = response.data[0].data.authorized
+        for(let y in response.data[0].data.authorized){
+          app.authorized.push(response.data[0].data.authorized[y].address)
+          app.accepted[response.data[0].data.authorized[y].address] = true
+        }
         app.pollAddress = response.data[0].address
         if(app.dna.owner === app.address){
           if(app.dna.type === "SECRET"){
@@ -134,9 +159,9 @@
               localStorage.setItem('pollPwD','')
 
               if(decrypted !== false){
-                app.poll = JSON.parse(decrypted)
+                app.poll = JSON.parse(JSON.parse(decrypted))
                 app.isDecrypted = true
-                app.fetchStats()
+                await app.fetchStats()
               }else{
                 app.decryptPoll()
               }
@@ -144,15 +169,15 @@
               app.decryptPoll()
             }
           }else{
-            app.fetchStats()
+            await app.fetchStats()
           }
         }else{
-          window.location = '/#/join/' + app.$route.params.uuid
+          window.location = '/#/poll/' + app.$route.params.uuid
         }
         app.isLoading = false
       }else{
         app.$buefy.toast.open({
-          message: 'Poll not found.',
+          message: 'Poll not ready.',
           type: 'is-danger'
         })
         window.location = '/#/history'
@@ -176,7 +201,8 @@
                         type: 'is-success'
                     })
                     app.isDecrypted = true
-                    app.poll = JSON.parse(decrypted)
+                    app.poll = JSON.parse(JSON.parse(decrypted))
+                    await app.fetchStats()
                     let start = moment(app.poll.start_date + 'T' + app.poll.start_time + ':00')
                     let end = moment(app.poll.end_date + 'T' + app.poll.end_time + ':00')
                     var visible = moment().isAfter(start)
@@ -215,7 +241,7 @@
                 let send = await app.scrypta.post('/invalidate',{
                   uuid: app.$route.params.uuid,
                   dapp_address: app.pollAddress,
-                  private_key: privkey
+                  private_key: privkey.replace('"','').replace('"','')
                 })
                 if(send.success !== undefined && send.success === true && send.txid !== null && send.txid.length === 64){  
                   app.$buefy.toast.open({
@@ -256,7 +282,7 @@
             app.isStarting = true
             let balance = await app.scrypta.get('/balance/' + app.address)
             let amountneeded = 0.001
-            let amountvotingcards = 0.001 * selected.length
+            let amountvotingcards = 0.0021 * selected.length
             amountneeded += amountvotingcards
             let pubkeys = app.shuffle(app.pubkeys)
             if(balance.balance >= amountneeded){
@@ -272,42 +298,66 @@
                     if(key !== false){
                       app.isUploading = true
                       let success = true
-                      for(let x in selected){
-                        let pubkey = ''
-                        for(let y in pubkeys){
-                          if(pubkeys[y].address === selected[x]){
-                            pubkey = pubkeys[y].key
-                          }
-                        }
-                        if(pubkey.length > 0){
-                          let newaddress = await app.scrypta.createAddress('000000', false)
-                          const rsakey = new NodeRSA(pubkey)
-                          let encrypted = rsakey.encrypt(newaddress.pub + ',' + newaddress.prv, 'base64')
-                          let sendcard = false
-                          let yy = 0
-                          while(sendcard === false){
-                            let send = await app.scrypta.post('/send',{
-                              from: app.address,
-                              to: app.pollAddress,
-                              amount: 0.0001,
-                              private_key: key.prv,
-                              message: 'poll://AUTH:' +  selected[x] + ':' + encrypted
-                            })
-                            if(send.data.txid !== undefined && send.data.txid.length === 64){
-                              sendcard = true
+                      if(app.dna.votetype === 'SECRET'){
+                        for(let x in selected){
+                          let pubkey = ''
+                          for(let y in pubkeys){
+                            if(pubkeys[y].address === selected[x] && app.sentCards.indexOf(pubkeys[y].address) === -1){
+                              pubkey = pubkeys[y].key
                             }
-                            if(yy > 19){
-                              success = false
-                              sendcard = true
-                            }
-                            yy++
                           }
-                        }else{
-                          success = false
+                          if(pubkey.length > 0){
+                            let newaddress = await app.scrypta.createAddress('000000', false)
+                            const rsakey = new NodeRSA(pubkey)
+                            let encrypted = rsakey.encrypt(newaddress.pub + ',' + newaddress.prv, 'base64')
+                            let sendcard = false
+                            // WRITING VOTING CARD TO POLL ADDRESS
+                            let yy = 0
+                            console.log('SENDING VOTING CARD')
+                            while(sendcard === false){
+                              let send = await app.scrypta.post('/send',{
+                                from: app.address,
+                                to: app.pollAddress,
+                                amount: 0.0001,
+                                private_key: key.prv,
+                                message: 'poll://AUTH:' +  selected[x] + ':' + encrypted
+                              })
+                              if(send.data.txid !== undefined && send.data.txid.length === 64){
+                                sendcard = true
+                              }
+                              if(yy > 19){
+                                success = false
+                                sendcard = true
+                              }
+                              yy++
+                            }
+                            let sendamountneeded = false
+                            // SENDING 0.0011 LYRA to voting card
+                            console.log('SENDING SENDING AMOUNT CARD')
+                            yy = 0
+                            while(sendamountneeded === false){
+                              let send = await app.scrypta.post('/send',{
+                                from: app.address,
+                                to: newaddress.pub,
+                                amount: 0.0011,
+                                private_key: key.prv
+                              })
+                              if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){
+                                sendamountneeded = true
+                              }
+                              if(yy > 19){
+                                success = false
+                                sendamountneeded = true
+                              }
+                              yy++
+                            }
+                          }
                         }
                       }
                       if(success === true){
                         let sendstart = false
+                        // WRITING VOTING START
+                        console.log('SENDING START')
                         let yy = 0
                         while(sendstart === false){
                           let send = await app.scrypta.post('/send',{
@@ -371,33 +421,36 @@
           app.isStarting = false
         }
       },
-      fetchStats(){
+      async fetchStats(){
         const app = this
-        
-        app.scrypta.post('/received',
+        let response = await app.scrypta.post('/received',
         { 
           address: app.pollAddress
         })
-        .then(function (response) {
-          var txs = response.data
-          for(let i in txs){
-            var tx=txs[i]
-            var exp = tx.data.split(':')
-            if(exp[0] === 'poll' && exp[1] === '//START'){
-              if(tx.sender === app.dna.owner){
-                app.isStarted = true
-              }
-            }
 
-            if(exp[0] === 'poll' && exp[1] === '//VOTE'){
-              app.voted = exp[2]
-              if(app.votes[exp[2]]){
-                app.votes[exp[2]] ++
-              }else{
-                app.votes[exp[2]] = 1
-              }
+        var txs = response.data
+        for(let i in txs){
+          var tx=txs[i]
+          var exp = tx.data.split(':')
+
+          for(let x in app.poll.answers){
+            app.votes[x] = 0
+          }
+          if(exp[0] === 'poll' && exp[1] === '//VOTE'){
+            if(app.votes[exp[2]]){
+              app.votes[exp[2]] ++
+            }else{
+              app.votes[exp[2]] = 1
             }
-            if(exp[0] === 'poll' && exp[1].indexOf('AUTHREQUEST') !== -1 && app.dna.type === 'AUTHORIZED'){
+          }
+          
+          if(exp[0] === 'poll' && exp[1] === '//START'){
+            if(tx.sender === app.dna.owner){
+              app.isStarted = true
+            }
+          }
+          if(exp[0] === 'poll' && exp[1].indexOf('AUTHREQUEST') !== -1 && app.dna.votetype === 'SECRET'){
+            if(app.dna.votetype === 'SECRET'){
               app.requestedCards.push(tx.sender)
               app.pubkeys.push({
                 address: tx.sender,
@@ -405,13 +458,13 @@
               })
               app.accepted[tx.sender] = true
             }
-            if(exp[0] === 'poll' && exp[1] === '//AUTH'){
-              if(exp[2] !== undefined && exp[2] !== 'undefined'){
-                app.authorized.push(exp[2])
-              }
+          }
+          if(exp[0] === 'poll' && exp[1] === '//AUTH'){
+            if(exp[2] !== undefined && exp[2] !== 'undefined' && app.sentCards.indexOf(exp[2]) === -1){
+              app.sentCards.push(exp[2])
             }
           }
-        })
+        }
       }
     }
   }
