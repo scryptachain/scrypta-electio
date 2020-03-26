@@ -160,6 +160,10 @@
                 app.voteCard = exp[3]
                 authorizedCount++
               }
+              if(exp[2] === app.address && exp[1] === '//AUTH' && tx.sender === app.dna.owner){
+                app.canVote = true
+                authorizedCount++
+              }
               if(tx.sender === app.address && exp[1] === '//VOTE' && app.dna.votetype === 'PUBLIC'){
                 app.userVoted = true
                 app.userVote = exp[2]

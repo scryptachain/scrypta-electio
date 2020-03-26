@@ -58,7 +58,7 @@
                       </div>
                     </div>
                   </div>
-                  <div v-if="authorized.length === 0 && sentCards.length === 0">
+                  <div v-if="sentCards.length === 0">
                     No authorized accounts, please go to "Manage" and start the poll.
                   </div>
                 </b-tab-item>
@@ -372,7 +372,7 @@
                         }
                       }
 
-                      if(app.dna.votetype === 'PUBLIC'){
+                      if(app.dna.votetype === 'PUBLIC' && app.dna.type === 'AUTHORIZED'){
                         for(let x in selected){
                           let yy = 0
                           let sendcard = false
@@ -382,7 +382,7 @@
                               to: app.pollAddress,
                               amount: 0.0001,
                               private_key: key.prv,
-                              message: 'poll://AUTH' +  selected[x]
+                              message: 'poll://AUTH:' +  selected[x]
                             })
                             if(send.data.txid !== undefined && send.data.txid.length === 64){
                               sendcard = true
