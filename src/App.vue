@@ -2,302 +2,331 @@
   <div id="app">
     <div v-if="!isLogging && !needsRSA && wallet">
       <b-navbar>
-          <template slot="brand">
-              <b-navbar-item tag="router-link" :to="{ path: '/' }">
-                  <img src="/logo.png" >
-              </b-navbar-item>
-          </template>
-          <template slot="start">
-              <b-navbar-item href="/#/">
-                  Home
-              </b-navbar-item>
-              <b-navbar-item href="/#/create">
-                  Create poll
-              </b-navbar-item>
-              <b-navbar-item href="/#/history">
-                  My History
-              </b-navbar-item>
-          </template>
+        <template slot="brand">
+          <b-navbar-item tag="router-link" :to="{ path: '/' }">
+            <img src="/logo.png" />
+          </b-navbar-item>
+        </template>
+        <template slot="start">
+          <b-navbar-item href="/#/">Home</b-navbar-item>
+          <b-navbar-item href="/#/create">Create poll</b-navbar-item>
+          <b-navbar-item href="/#/history">My History</b-navbar-item>
+        </template>
 
-          <template slot="end">
-              <b-navbar-item tag="div">
-                  <div class="buttons">
-                      <a v-on:click="logoutUser" class="button is-primary">
-                          <strong>Logout</strong>
-                      </a>
-                  </div>
-              </b-navbar-item>
-          </template>
+        <template slot="end">
+          <b-navbar-item tag="div">
+            <div class="buttons">
+              <a v-on:click="logoutUser" class="button is-primary">
+                <strong>Logout</strong>
+              </a>
+            </div>
+          </b-navbar-item>
+        </template>
       </b-navbar>
-      <router-view/>
-      <hr>
-      Scrypta Polls System is an <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
-      <br><br>
+      <router-view />
+      <hr />Scrypta Polls System is an
+      <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by
+      <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
+      <br />
+      <br />
     </div>
     <div v-if="needsRSA && wallet">
-    <section class="hero">
+      <section class="hero">
         <div class="hero-body">
           <div class="container">
-            <img src="/logo.png" width="100"><br><br>
-            <h1 class="title">
-              Scrypta Polls System
-            </h1>
+            <img src="/logo.png" width="100" />
+            <br />
+            <br />
+            <h1 class="title">Scrypta Polls System</h1>
             <h2 class="subtitle">
-              Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.<br>
-              Your address is {{ address }} but we need an RSA key before start.<br><br>
+              Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
+              <br />
+              Your address is {{ address }} but we need an RSA key before start.
+              <br />
+              <br />
               <b-button size="is-medium" type="is-primary" v-on:click="showCreate">Create Keys Now!</b-button>
             </h2>
-            <hr>
-            Scrypta Polls System is an <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
-            <br><br>
+            <b-button size="is-medium" type="is-primary" v-on:click="logout">Logout</b-button>
+            <hr />Scrypta Polls System is an
+            <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by
+            <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
+            <br />
+            <br />
           </div>
         </div>
       </section>
     </div>
     <div v-if="!wallet">
       <section class="hero">
-        <div class="hero-body">
+        <div class="hero-body" style="padding: 0;">
+          <div
+            class="row nopadding"
+            style="min-height: 100vh; background-image: url('bg-home.jpg');"
+          >
+            <img src="/logo.png" width="100" style="margin-top: 50px;">
+            <h1 class="title">Scrypta Polls System</h1>
+            <h2
+              class="subtitle"
+            >Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.</h2>
+
+
+             <b-icon
+                pack="fas"
+                icon="chevron-down">
+            </b-icon>
+          </div>
           <div class="container">
-            <img src="/logo.png" width="100"><br><br>
-            <h1 class="title">
-              Scrypta Polls System
-            </h1>
             <h2 class="subtitle">
-              Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.<br>
-              You can enter with ScryptaID extension or just create a new identity.<br><br>
-              Login with Scrypta ID Extension or create a new wallet with <a href="https://web.manent.app">Manent Web</a> and load the .sid file here.<br><br>
-              <b-upload v-model="file"
-                v-on:input="loadWalletFromFile"
-                drag-drop>
+              Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
+              <br />You can enter with ScryptaID extension or just create a new identity.
+              <br />
+              <br />Login with Scrypta ID Extension or create a new wallet with
+              <a href="https://web.manent.app">Manent Web</a> and load the .sid file here.
+              <br />
+              <br />
+              <b-upload v-model="file" v-on:input="loadWalletFromFile" drag-drop>
                 <section class="section">
-                    <div class="content has-text-centered">
-                        <p>Drop your .sid file here or click to upload</p>
-                    </div>
+                  <div class="content has-text-centered">
+                    <p>Drop your .sid file here or click to upload</p>
+                  </div>
                 </section>
               </b-upload>
-              <hr>
-              Scrypta Polls System is an <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
-              <br><br>
+              <hr />Scrypta Polls System is an
+              <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by
+              <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
+              <br />
+              <br />
             </h2>
           </div>
         </div>
       </section>
     </div>
     <b-loading :is-full-page="true" :active.sync="isLogging" :can-cancel="false"></b-loading>
-    <b-modal :active.sync="showCreateModal"
-              has-modal-card
-              trap-focus
-              aria-role="dialog"
-              aria-modal>
-              <form action="">
-                <div class="modal-card" style="width: auto">
-                    <header class="modal-card-head">
-                        <p v-if="!wallet" class="modal-card-title">Create new Identity</p>
-                        <p v-if="wallet" class="modal-card-title">Update Identity</p>
-                    </header>
-                    <section class="modal-card-body">
+    <b-modal :active.sync="showCreateModal" has-modal-card trap-focus aria-role="dialog" aria-modal>
+      <form action>
+        <div class="modal-card" style="width: auto">
+          <header class="modal-card-head">
+            <p v-if="!wallet" class="modal-card-title">Create new Identity</p>
+            <p v-if="wallet" class="modal-card-title">Update Identity</p>
+          </header>
+          <section class="modal-card-body">
+            <b-field label="Insert Password">
+              <b-input
+                type="password"
+                v-model="password"
+                password-reveal
+                placeholder="Your main password"
+                required
+              ></b-input>
+            </b-field>
 
-                        <b-field label="Insert Password">
-                            <b-input
-                                type="password"
-                                v-model="password"
-                                password-reveal
-                                placeholder="Your main password"
-                                required>
-                            </b-input>
-                        </b-field>
-
-                        <b-field v-if="!wallet" label="Repeat password">
-                            <b-input
-                                type="password"
-                                v-model="passwordrepeat"
-                                password-reveal
-                                placeholder="Repeat password"
-                                required>
-                            </b-input>
-                        </b-field>
-                    </section>
-                    <footer v-if="!isCreating && !isUpdating" class="modal-card-foot">
-                        <button v-if="!wallet" class="button is-primary" style="width:100%" v-on:click="createUser">CREATE</button>
-                        <button v-if="wallet" class="button is-primary" style="width:100%" v-on:click="updateUser">UPDATE</button>
-                    </footer>
-                    <footer v-if="isCreating" class="modal-card-foot">
-                        <div style="text-align:center">Creating identity, please wait...</div>
-                    </footer>
-                    <footer v-if="isUpdating" class="modal-card-foot">
-                        <div style="text-align:center">Updating identity, please wait...</div>
-                    </footer>
-                </div>
-            </form>
+            <b-field v-if="!wallet" label="Repeat password">
+              <b-input
+                type="password"
+                v-model="passwordrepeat"
+                password-reveal
+                placeholder="Repeat password"
+                required
+              ></b-input>
+            </b-field>
+          </section>
+          <footer v-if="!isCreating && !isUpdating" class="modal-card-foot">
+            <button
+              v-if="!wallet"
+              class="button is-primary"
+              style="width:100%"
+              v-on:click="createUser"
+            >CREATE</button>
+            <button
+              v-if="wallet"
+              class="button is-primary"
+              style="width:100%"
+              v-on:click="updateUser"
+            >UPDATE</button>
+          </footer>
+          <footer v-if="isCreating" class="modal-card-foot">
+            <div style="text-align:center">Creating identity, please wait...</div>
+          </footer>
+          <footer v-if="isUpdating" class="modal-card-foot">
+            <div style="text-align:center">Updating identity, please wait...</div>
+          </footer>
+        </div>
+      </form>
     </b-modal>
   </div>
 </template>
 
 <script>
-  let ScryptaCore = require('@scrypta/core')
-  
-  export default {
-    data(){ 
-      return {
-        scrypta: new ScryptaCore(true),
-        address: '',
-        wallet: '',
-        isLogging: true,
-        file: [],
-        needsRSA: false,
-        isCreating: false,
-        isUpdating: false,
-        showCreateModal: false,
-        password: '',
-        passwordrepeat: ''
-      }
-    },
-    async mounted() {
-      const app = this
-      app.wallet = await app.scrypta.importBrowserSID()
-      app.wallet = await app.scrypta.returnDefaultIdentity()
-      if(app.wallet.length > 0){
-        let SIDS = app.wallet.split(':')
-        app.address = SIDS[0]
-        let identity = await app.scrypta.returnIdentity(app.address)
-        if(identity.rsa === undefined){
-          app.needsRSA = true
-        }
-        app.wallet = identity
-        app.isLogging = false
-      }else{
-        app.isLogging = false
-      }
-    },
-    methods: {
-      loadWalletFromFile() {
-        const app = this
-        const file = app.file;
-        const reader = new FileReader();
-        reader.onload = function() {
-          var dataKey = reader.result
+let ScryptaCore = require("@scrypta/core");
 
-          app.$buefy.dialog.prompt({
-            message: `Enter wallet password`,
-            inputAttrs: {
-                type: 'password'
-            },
-            trapFocus: true,
-            onConfirm: async (password) => {
-              let key = await app.scrypta.readKey(password,dataKey)
-              if(key !== false){
-                app.scrypta.importPrivateKey(key.prv, password)
-                localStorage.setItem('SID', dataKey)
-                location.reload()
-              }else{
-                app.$buefy.toast.open({
-                  message: 'Wrong password!',
-                  type: 'is-danger'
-                })
-              }
+export default {
+  data() {
+    return {
+      scrypta: new ScryptaCore(true),
+      address: "",
+      wallet: "",
+      isLogging: true,
+      file: [],
+      needsRSA: false,
+      isCreating: false,
+      isUpdating: false,
+      showCreateModal: false,
+      password: "",
+      passwordrepeat: ""
+    };
+  },
+  async mounted() {
+    const app = this;
+    app.wallet = await app.scrypta.importBrowserSID();
+    app.wallet = await app.scrypta.returnDefaultIdentity();
+    if (app.wallet.length > 0) {
+      let SIDS = app.wallet.split(":");
+      app.address = SIDS[0];
+      let identity = await app.scrypta.returnIdentity(app.address);
+      if (identity.rsa === undefined) {
+        app.needsRSA = true;
+      }
+      app.wallet = identity;
+      app.isLogging = false;
+    } else {
+      app.isLogging = false;
+    }
+  },
+  methods: {
+    loadWalletFromFile() {
+      const app = this;
+      const file = app.file;
+      const reader = new FileReader();
+      reader.onload = function() {
+        var dataKey = reader.result;
+
+        app.$buefy.dialog.prompt({
+          message: `Enter wallet password`,
+          inputAttrs: {
+            type: "password"
+          },
+          trapFocus: true,
+          onConfirm: async password => {
+            let key = await app.scrypta.readKey(password, dataKey);
+            if (key !== false) {
+              app.scrypta.importPrivateKey(key.prv, password);
+              localStorage.setItem("SID", dataKey);
+              location.reload();
+            } else {
+              app.$buefy.toast.open({
+                message: "Wrong password!",
+                type: "is-danger"
+              });
             }
-          })
-        };
-        reader.readAsText(file);
-      },
-      showCreate(){
-        const app = this
-        app.showCreateModal = true
-      },
-      logoutUser(){
-        localStorage.setItem('SID','')
-        location.reload()
-      },
-      async createUser(){
-        const app = this
-        if(app.password !== ''){
-          if(app.passwordrepeat === app.password){
-            app.isCreating = true
-            setTimeout(async function(){
-              let id = await app.scrypta.createAddress(app.password, true)
-              await app.scrypta.createRSAKeys(id.pub, app.password)
-              let identity = await app.scrypta.returnIdentity(id.pub)
-              app.needsRSA = false
-              app.address = id.pub
-              app.wallet = identity
-              localStorage.setItem('SID', id.walletstore)
-              app.showCreateModal = false
-              app.password = ''
-              app.passwordrepeat = ''
-              let tx = await app.scrypta.post('/init',{
-                address: id.pub,
-                airdrop: true
-              })
-              if(tx.airdrop_tx === false){
-                app.$buefy.toast.open({
-                  message: 'Sorry, airdrop was not successful!',
-                  type: 'is-danger'
-                })
-              }
-              app.isCreating = false
-            }, 500)
-          }else{
-            app.$buefy.toast.open({
-                message: 'Passwords doesn\'t matches.',
-                type: 'is-danger'
-            })
           }
-        }else{
+        });
+      };
+      reader.readAsText(file);
+    },
+    showCreate() {
+      const app = this;
+      app.showCreateModal = true;
+    },
+    logoutUser() {
+      localStorage.setItem("SID", "");
+      location.reload();
+    },
+    async createUser() {
+      const app = this;
+      if (app.password !== "") {
+        if (app.passwordrepeat === app.password) {
+          app.isCreating = true;
+          setTimeout(async function() {
+            let id = await app.scrypta.createAddress(app.password, true);
+            await app.scrypta.createRSAKeys(id.pub, app.password);
+            let identity = await app.scrypta.returnIdentity(id.pub);
+            app.needsRSA = false;
+            app.address = id.pub;
+            app.wallet = identity;
+            localStorage.setItem("SID", id.walletstore);
+            app.showCreateModal = false;
+            app.password = "";
+            app.passwordrepeat = "";
+            let tx = await app.scrypta.post("/init", {
+              address: id.pub,
+              airdrop: true
+            });
+            if (tx.airdrop_tx === false) {
+              app.$buefy.toast.open({
+                message: "Sorry, airdrop was not successful!",
+                type: "is-danger"
+              });
+            }
+            app.isCreating = false;
+          }, 500);
+        } else {
           app.$buefy.toast.open({
-              message: 'Write a password first!',
-              type: 'is-danger'
-          })
+            message: "Passwords doesn't matches.",
+            type: "is-danger"
+          });
         }
-      },
-      async updateUser(){
-        const app = this
-        if(app.password !== ''){
-          let walletstore = app.wallet.wallet
-          let key = await app.scrypta.readKey(app.password,walletstore)
-          if(key !== false){
-            app.isUpdating = true
-            setTimeout(async function(){
-              let res = await app.scrypta.createRSAKeys(app.wallet.wallet, app.password)
-              if(res !== false){
-                let identity = await app.scrypta.returnIdentity(app.address)
-                let balance = await app.scrypta.get('/balance/' + app.address)
-                if(balance.balance === 0){
-                  await app.scrypta.post('/init',{dapp_address: app.address, airdrop: true})
-                }
-                app.needsRSA = false
-                app.wallet = identity
-                app.showCreateModal = false
-                app.password = ''
-                app.passwordrepeat = ''
-                app.isUpdating = false
-              }else{
-                app.isUpdating = false
-                app.$buefy.toast.open({
-                    message: 'Password is wrong!',
-                    type: 'is-danger'
-                })
+      } else {
+        app.$buefy.toast.open({
+          message: "Write a password first!",
+          type: "is-danger"
+        });
+      }
+    },
+    async updateUser() {
+      const app = this;
+      if (app.password !== "") {
+        let walletstore = app.wallet.wallet;
+        let key = await app.scrypta.readKey(app.password, walletstore);
+        if (key !== false) {
+          app.isUpdating = true;
+          setTimeout(async function() {
+            let res = await app.scrypta.createRSAKeys(
+              app.wallet.wallet,
+              app.password
+            );
+            if (res !== false) {
+              let identity = await app.scrypta.returnIdentity(app.address);
+              let balance = await app.scrypta.get("/balance/" + app.address);
+              if (balance.balance === 0) {
+                await app.scrypta.post("/init", {
+                  dapp_address: app.address,
+                  airdrop: true
+                });
               }
-            }, 500)
-          }else{
-            app.$buefy.toast.open({
-              message: 'Wrong password!',
-              type: 'is-danger'
-            })
-          }
-        }else{
+              app.needsRSA = false;
+              app.wallet = identity;
+              app.showCreateModal = false;
+              app.password = "";
+              app.passwordrepeat = "";
+              app.isUpdating = false;
+            } else {
+              app.isUpdating = false;
+              app.$buefy.toast.open({
+                message: "Password is wrong!",
+                type: "is-danger"
+              });
+            }
+          }, 500);
+        } else {
           app.$buefy.toast.open({
-              message: 'Write a password first!',
-              type: 'is-danger'
-          })
+            message: "Wrong password!",
+            type: "is-danger"
+          });
         }
+      } else {
+        app.$buefy.toast.open({
+          message: "Write a password first!",
+          type: "is-danger"
+        });
       }
     }
   }
+};
 </script>
 
 <style>
 #app {
-  font-family: 'Sen';
+  font-family: "Sen";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

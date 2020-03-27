@@ -8,6 +8,7 @@ import Gravatar from 'vue-gravatar';
 import SecretPoll from "./components/SecretPoll.vue"
 import PublicPoll from "./components/PublicPoll.vue"
 
+
 Vue.component('v-gravatar', Gravatar);
 Vue.component('SecretPoll', SecretPoll);
 Vue.component('PublicPoll', PublicPoll);
