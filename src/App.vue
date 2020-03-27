@@ -72,36 +72,30 @@
         <div class="hero-body" style="padding: 0;">
           <div style="min-height: 100vh; background-image: url('bg-home.jpg');">
             <div class="container">
-              <b-button
-                size="is-medium"
-                style="position: absolute; top: 45px; right: 0;"
-                type="is-primary"
-              >Login</b-button>
               <img src="/logo.png" width="250" style="margin-top: 50px;" />
               <h1 style="margin-top: 20px;">Poll system over the blockchain</h1>
+              <h2 class="subtitle">
+                Electio è una piattaforma creata per il voto elettronico. La blockchain decentralizzata e permissionless di Scrypta permette un alto livello di trasparenza, sicurezza e affidabilità in tutte le fasi del voto.
+              </h2>
 
               <div class="columns" style="margin-top: 100px;">
                 <div class="column">
                   <div class="card">
-                    <div class="card-image">
-                      <figure class="image is-4by3">
-                        <img
-                          src="https://bulma.io/images/placeholders/1280x960.png"
-                          alt="Placeholder image"
-                        />
-                      </figure>
-                    </div>
                     <div class="card-content">
                       <div class="media">
                         <div class="media-left"></div>
                         <div class="media-content">
-                          <p class="title is-4 text-center">John Smith</p>
+                          <p class="title is-2 text-center">Voto con autorizzazione</p>
                         </div>
                       </div>
 
                       <div class="content">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Phasellus nec iaculis mauris.
+                        <strong>Quesito pubblico con autorizzazione / Voto Segreto</strong>
+                        <br />Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore, che viene autorizzato a votare dal creatore del quesito, è segreto.
+                        <br />
+                        <br />
+                        <strong>Quesito pubblico con autorizzazione / Voto palese</strong>
+                        <br />Il quesito della votazione è visualizzabile in chiaro; il voto dell’elettore, che viene autorizzato a votare dal creatore del quesito, è palese.
                       </div>
                     </div>
                   </div>
@@ -109,25 +103,17 @@
 
                 <div class="column">
                   <div class="card">
-                    <div class="card-image">
-                      <figure class="image is-4by3">
-                        <img
-                          src="https://bulma.io/images/placeholders/1280x960.png"
-                          alt="Placeholder image"
-                        />
-                      </figure>
-                    </div>
                     <div class="card-content">
                       <div class="media">
                         <div class="media-left"></div>
                         <div class="media-content">
-                          <p class="title is-4 text-center">John Smith</p>
+                          <p class="title is-2 text-center">Quesito Pubblico (sondaggistica)</p>
                         </div>
                       </div>
 
                       <div class="content">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Phasellus nec iaculis mauris.
+                        <strong>Quesito pubblico / Voto Palese</strong>
+                        <br />Il quesito della votazione è visualizzabile in chiaro, il voto dell’elettore è in chiaro e tutti possono votare senza autorizzazione. utile per fini di sondaggio.
                       </div>
                     </div>
                   </div>
@@ -135,64 +121,67 @@
 
                 <div class="column">
                   <div class="card">
-                    <div class="card-image">
-                      <figure class="image is-4by3">
-                        <img
-                          src="https://bulma.io/images/placeholders/1280x960.png"
-                          alt="Placeholder image"
-                        />
-                      </figure>
-                    </div>
                     <div class="card-content">
                       <div class="media">
                         <div class="media-left"></div>
                         <div class="media-content">
-                          <p class="title is-4 text-center">John Smith</p>
+                          <p class="title is-2 text-center">Quesito Segreto</p>
                         </div>
                       </div>
 
                       <div class="content">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Phasellus nec iaculis mauris.
+                        <strong>Quesito segreto / Voto Palese</strong>
+                        <br />Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore, che viene pre-autorizzato a votare dal creatore del quesito, è palese (non segreto).
+                        <br />
+                        <br />
+                        <strong>Quesito segreto / Voto Segreto</strong>
+                        <br />Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore, che viene pre-autorizzato a votare dal creatore del quesito, è segreto
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+            <div style="width: 100%; position: absolute; botton: 0; left: 0;">
               <p style="margin-top:30px;">START NOW</p>
               <a href="#create">
-              <b-icon pack="fas" icon="chevron-down">
-              </b-icon>
+                <b-icon pack="fas" icon="chevron-down"></b-icon>
               </a>
             </div>
           </div>
-          <div class="container" id="create" style="background-color: #1C1C1C">
-            <h2 class="subtitle">
-              Electio will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
-              <br />You can enter with ScryptaID extension or just create a new identity.
-              <br />
-              <br />Login with Scrypta ID Extension or create a new wallet with
-              <a
-                href="https://web.manent.app"
-              >Manent Web</a> and load the .sid file here.
-              <br />
-              <br />
-              <b-upload v-model="file" v-on:input="loadWalletFromFile" drag-drop>
-                <section class="section">
-                  <div class="content has-text-centered">
-                    <p>Drop your .sid file here or click to upload</p>
-                  </div>
-                </section>
-              </b-upload>
-              <hr />Scrypta Polls System is an
-              <a
-                href="https://github.com/scryptachain/scrypta-polls"
-                target="_blank"
-              >open-source</a> project by
-              <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
-              <br />
-              <br />
-            </h2>
+          <div class="container" id="create" style="margin-top:50px;">
+            <div class="card">
+              <div style="padding: 50px 20px;">
+                <h1 class="title is-1">Start Now</h1>
+                <br />
+                <h2 class="subtitle">
+                  Electio will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
+                  <br />You can enter with ScryptaID extension or just create a new identity.
+                  <br />
+                  <br />Login with Scrypta ID Extension or create a new wallet with
+                  <a
+                    href="https://web.manent.app"
+                  >Manent Web</a> and load the .sid file here.
+                  <br />
+                  <br />
+                  <b-upload v-model="file" v-on:input="loadWalletFromFile" drag-drop>
+                    <section class="section">
+                      <div class="content has-text-centered">
+                        <p>Drop your .sid file here or click to upload</p>
+                      </div>
+                    </section>
+                  </b-upload>
+                </h2>
+              </div>
+            </div>
+            <br />Scrypta Polls System is an
+            <a
+              href="https://github.com/scryptachain/scrypta-polls"
+              target="_blank"
+            >open-source</a> project by
+            <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
+            <br />
+            <br />
           </div>
         </div>
       </section>
