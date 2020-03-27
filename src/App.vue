@@ -25,7 +25,10 @@
       </b-navbar>
       <router-view />
       <hr />Scrypta Polls System is an
-      <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by
+      <a
+        href="https://github.com/scryptachain/scrypta-polls"
+        target="_blank"
+      >open-source</a> project by
       <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
       <br />
       <br />
@@ -34,6 +37,12 @@
       <section class="hero">
         <div class="hero-body">
           <div class="container">
+            <b-button
+              size="is-medium"
+              style="position: absolute; top: 0; right: 0;"
+              type="is-primary"
+              v-on:click="logout"
+            >Logout</b-button>
             <img src="/logo.png" width="100" />
             <br />
             <br />
@@ -44,11 +53,13 @@
               Your address is {{ address }} but we need an RSA key before start.
               <br />
               <br />
-              <b-button size="is-medium" type="is-primary" v-on:click="showCreate">Create Keys Now!</b-button>
+              <b-button size="is-medium" type="is-primary" v-on:click="showCreate">Create Poll Keys</b-button>
             </h2>
-            <b-button size="is-medium" type="is-primary" v-on:click="logout">Logout</b-button>
             <hr />Scrypta Polls System is an
-            <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by
+            <a
+              href="https://github.com/scryptachain/scrypta-polls"
+              target="_blank"
+            >open-source</a> project by
             <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
             <br />
             <br />
@@ -59,33 +70,111 @@
     <div v-if="!wallet">
       <section class="hero">
         <div class="hero-body" style="padding: 0;">
-          <div
-            class="row nopadding"
-            style="min-height: 100vh; background-image: url('bg-home.jpg');"
-          >
-            <img src="/logo.png" width="100" style="margin-top: 50px;">
-            <h1 class="title">Scrypta Polls System</h1>
-            <h2
-              class="subtitle"
-            >Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.</h2>
-          <b-icon
-                pack="fas"
-                icon="chevron-down"
-                size="is-small">
-            </b-icon>
+          <div style="min-height: 100vh; background-image: url('bg-home.jpg');">
+            <div class="container">
+              <b-button
+                size="is-medium"
+                style="position: absolute; top: 45px; right: 0;"
+                type="is-primary"
+              >Login</b-button>
+              <img src="/logo.png" width="250" style="margin-top: 50px;" />
+              <h1 style="margin-top: 20px;">Poll system over the blockchain</h1>
 
-             <b-icon
-                pack="fas"
-                icon="chevron-down">
-            </b-icon>
+              <div class="columns" style="margin-top: 100px;">
+                <div class="column">
+                  <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="https://bulma.io/images/placeholders/1280x960.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
+                    </div>
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-left"></div>
+                        <div class="media-content">
+                          <p class="title is-4 text-center">John Smith</p>
+                        </div>
+                      </div>
+
+                      <div class="content">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Phasellus nec iaculis mauris.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="https://bulma.io/images/placeholders/1280x960.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
+                    </div>
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-left"></div>
+                        <div class="media-content">
+                          <p class="title is-4 text-center">John Smith</p>
+                        </div>
+                      </div>
+
+                      <div class="content">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Phasellus nec iaculis mauris.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="https://bulma.io/images/placeholders/1280x960.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
+                    </div>
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-left"></div>
+                        <div class="media-content">
+                          <p class="title is-4 text-center">John Smith</p>
+                        </div>
+                      </div>
+
+                      <div class="content">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Phasellus nec iaculis mauris.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p style="margin-top:30px;">START NOW</p>
+              <a href="#create">
+              <b-icon pack="fas" icon="chevron-down">
+              </b-icon>
+              </a>
+            </div>
           </div>
-          <div class="container">
+          <div class="container" id="create" style="background-color: #1C1C1C">
             <h2 class="subtitle">
-              Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
+              Electio will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
               <br />You can enter with ScryptaID extension or just create a new identity.
               <br />
               <br />Login with Scrypta ID Extension or create a new wallet with
-              <a href="https://web.manent.app">Manent Web</a> and load the .sid file here.
+              <a
+                href="https://web.manent.app"
+              >Manent Web</a> and load the .sid file here.
               <br />
               <br />
               <b-upload v-model="file" v-on:input="loadWalletFromFile" drag-drop>
@@ -96,7 +185,10 @@
                 </section>
               </b-upload>
               <hr />Scrypta Polls System is an
-              <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by
+              <a
+                href="https://github.com/scryptachain/scrypta-polls"
+                target="_blank"
+              >open-source</a> project by
               <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
               <br />
               <br />
