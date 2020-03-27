@@ -68,7 +68,11 @@
             <h2
               class="subtitle"
             >Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.</h2>
-
+          <b-icon
+                pack="fas"
+                icon="chevron-down"
+                size="is-small">
+            </b-icon>
 
              <b-icon
                 pack="fas"
