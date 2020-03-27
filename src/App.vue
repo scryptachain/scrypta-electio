@@ -24,7 +24,7 @@
         </template>
       </b-navbar>
       <router-view />
-      <hr />Scrypta Polls System is an
+      <hr />Scrypta Electio is an
       <a
         href="https://github.com/scryptachain/scrypta-polls"
         target="_blank"
@@ -46,7 +46,7 @@
             <img src="/logo.png" width="100" />
             <br />
             <br />
-            <h1 class="title">Scrypta Polls System</h1>
+            <h1 class="title">Scrypta Electio</h1>
             <h2 class="subtitle">
               Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
               <br />
@@ -55,7 +55,7 @@
               <br />
               <b-button size="is-medium" type="is-primary" v-on:click="showCreate">Create Poll Keys</b-button>
             </h2>
-            <hr />Scrypta Polls System is an
+            <hr />Scrypta Electio is an
             <a
               href="https://github.com/scryptachain/scrypta-polls"
               target="_blank"
@@ -155,26 +155,26 @@
                 <h1 class="title is-1">Start Now</h1>
                 <br />
                 <h2 class="subtitle">
-                  Electio will allow you to create and manage polls, linked forever to the Scrypta Blockchain.
-                  <br />You can enter with ScryptaID extension or just create a new identity.
+                  Scrypta Electio  ti permette di creare e gestire votazioni e sondaggi utilizzando la blockchain di Scrypta
+                  <br />Puoi accedere con Scrypta ID extension o creando una nuova identità
                   <br />
-                  <br />Login with Scrypta ID Extension or create a new wallet with
+                  <br />Accedi con  Scrypta ID Extension o crea un nuovo wallet con
                   <a
                     href="https://web.manent.app"
-                  >Manent Web</a> and load the .sid file here.
+                  >Manent Web</a> e fai l'upload del file .sid qui.
                   <br />
                   <br />
                   <b-upload v-model="file" v-on:input="loadWalletFromFile" drag-drop>
                     <section class="section">
                       <div class="content has-text-centered">
-                        <p>Drop your .sid file here or click to upload</p>
+                        <p>Trascina il tuo file .sid here or clicca su upload</p>
                       </div>
                     </section>
                   </b-upload>
                 </h2>
               </div>
             </div>
-            <br />Scrypta Polls System is an
+            <br />Scrypta Electio is an
             <a
               href="https://github.com/scryptachain/scrypta-polls"
               target="_blank"
