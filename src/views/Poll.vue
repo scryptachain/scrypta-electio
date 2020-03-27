@@ -26,13 +26,16 @@
                 <span v-if="parseFloat(userVote) === parseFloat(index)"> X </span> {{ answer.answer }}: <span v-if="votes[index]">{{votes[index]}}</span><span v-if="!votes[index]">0</span> <span style="font-weight:normal" v-if="votes[index] === 1">VOTE</span><span  style="font-weight:normal"  v-if="votes[index] !== 1">VOTES</span>
               </b-button>
             </div>
+            <div v-if="!isEnded" class="text-center">
+              Sorry, the poll is ended.
+            </div>
             <div v-if="!isStarted" class="text-center">
               Sorry, the poll has not started.
             </div>
             <div class="text-center" v-if="isUploading">
               Sending vote, please wait...
             </div>
-            <div class="text-center" v-if="!canVote">
+            <div class="text-center" v-if="!canVote && !isEnded">
               Ops, you can't vote.
             </div>
         </section>
@@ -111,8 +114,8 @@
     methods: {
       async checkCanVote(){
         const app = this
-        let start = moment(app.poll.start_date + 'T' + app.poll.start_time + ':00+1:00')
-        let end = moment(app.poll.end_date + 'T' + app.poll.end_time + ':00+1:00')
+        let start = moment(app.poll.start_date + 'T' + app.poll.start_time + ':00')
+        let end = moment(app.poll.end_date + 'T' + app.poll.end_time + ':00')
         if(moment().isBefore(start)){
           app.canVote = false
         }

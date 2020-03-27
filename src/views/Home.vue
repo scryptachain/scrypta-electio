@@ -60,8 +60,8 @@
         var dna = polls[i].data.dna
         var authorized = polls[i].data.authorized
         if(poll !== undefined && dna !== undefined && dna.type !== undefined && dna.type !== 'SECRET'){
-          let start = moment(poll.start_date + 'T' + poll.start_time + ':00+01:00')
-          let end = moment(poll.end_date + 'T' + poll.end_time + ':00+01:00')
+          let start = moment(poll.start_date + 'T' + poll.start_time + ':00')
+          let end = moment(poll.end_date + 'T' + poll.end_time + ':00')
           if(moment().isAfter(start)){
             if(moment().isBefore(end)){
               app.activePolls.push(polls[i])

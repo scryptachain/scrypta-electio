@@ -256,6 +256,7 @@
           app.pollPreAuthorized = validAddresses
           app.isChecking = false
         }
+
         if(app.pollType === 'SECRET' && app.pollPreAuthorized.length === 0){
           valid = false
           app.$buefy.toast.open({
@@ -263,6 +264,15 @@
               type: 'is-danger'
           })
         }
+
+        if(app.pollType === 'SECRET' && app.pollSecretKey.length === 0){
+          valid = false
+          app.$buefy.toast.open({
+              message: 'You must write a passphrase!',
+              type: 'is-danger'
+          })
+        }
+
         if(valid && app.pollName !== '' && app.pollStartDate !== '' && app.pollStartTime !== '' && app.pollEndDate !== '' && app.pollEndTime !== '' && app.pollQuestion !== '' && app.pollAnswers.length > 0 && app.isUploading === false){
           app.$buefy.dialog.prompt({
             message: `Enter wallet password`,
