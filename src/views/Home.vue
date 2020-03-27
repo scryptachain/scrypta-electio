@@ -1,7 +1,8 @@
 <template>
   <div class="main text-left">
     <div class="container">
-        <h1>Welcome back</h1>
+         <v-gravatar :email="address" style="float:left; margin-right:20px; width:75px; height:75px;"/>
+         <h1>Welcome back</h1>
         <h3>{{ address }}</h3>
         <hr>
         <div v-if="activePolls.length > 0">

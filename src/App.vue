@@ -260,6 +260,10 @@
               let res = await app.scrypta.createRSAKeys(app.wallet.wallet, app.password)
               if(res !== false){
                 let identity = await app.scrypta.returnIdentity(app.address)
+                let balance = await app.scrypta.get('/balance/' + app.address)
+                if(balance.balance === 0){
+                  await app.scrypta.post('/init',{dapp_address: app.address, airdrop: true})
+                }
                 app.needsRSA = false
                 app.wallet = identity
                 app.showCreateModal = false
