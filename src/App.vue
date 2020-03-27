@@ -38,6 +38,7 @@
     <section class="hero">
         <div class="hero-body">
           <div class="container">
+            <img src="/logo.png" width="100"><br><br>
             <h1 class="title">
               Scrypta Polls System
             </h1>
@@ -46,6 +47,9 @@
               Your address is {{ address }} but we need an RSA key before start.<br><br>
               <b-button size="is-medium" type="is-primary" v-on:click="showCreate">Create Keys Now!</b-button>
             </h2>
+            <hr>
+            Scrypta Polls System is an <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
+            <br><br>
           </div>
         </div>
       </section>
@@ -54,6 +58,7 @@
       <section class="hero">
         <div class="hero-body">
           <div class="container">
+            <img src="/logo.png" width="100"><br><br>
             <h1 class="title">
               Scrypta Polls System
             </h1>
@@ -70,6 +75,9 @@
                     </div>
                 </section>
               </b-upload>
+              <hr>
+              Scrypta Polls System is an <a href="https://github.com/scryptachain/scrypta-polls" target="_blank">open-source</a> project by <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
+              <br><br>
             </h2>
           </div>
         </div>
