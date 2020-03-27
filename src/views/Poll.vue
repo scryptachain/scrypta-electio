@@ -10,9 +10,29 @@
             <b-message v-if="userVoted" title="Attention please!" type="is-danger" aria-close-label="Close message">
               You've voted yet for this poll, please remember that you can vote again and the last vote will be considered.
             </b-message>
-            <v-gravatar :email="dna.owner" style="float:left; margin-right:20px;" />
+            <v-gravatar :email="dna.owner" style="float:left; margin-right:20px; width:100px; height:100px;" />
             <h1>{{ poll.name }}</h1>
             <b>Available from</b> {{ poll.start_date }} {{ poll.start_time }}:00 <b>till</b> {{ poll.end_date }} {{ poll.end_time }}:00
+            <social-sharing :url="'https://polls.scryptachain.org/#/poll/' + $route.params.uuid" inline-template>
+              <div class="social-shares">
+                <b>Share on: </b>
+                <network network="linkedin">
+                  <i class="fa fa-fw fa-linkedin"></i> LinkedIn
+                </network>
+                <network network="reddit">
+                  <i class="fa fa-fw fa-reddit"></i> Reddit
+                </network>
+                <network network="twitter">
+                  <i class="fa fa-fw fa-twitter"></i> Twitter
+                </network>
+                <network network="telegram">
+                  <i class="fa fa-telegram"></i> Telegram
+                </network>
+                <network network="whatsapp">
+                  <i class="fa fa-fw fa-whatsapp"></i> Whatsapp
+                </network>
+              </div>
+            </social-sharing>
             <hr>
             <p>{{ poll.question }}</p>
             <hr>
@@ -26,7 +46,7 @@
                 <span v-if="parseFloat(userVote) === parseFloat(index)"> X </span> {{ answer.answer }}: <span v-if="votes[index]">{{votes[index]}}</span><span v-if="!votes[index]">0</span> <span style="font-weight:normal" v-if="votes[index] === 1">VOTE</span><span  style="font-weight:normal"  v-if="votes[index] !== 1">VOTES</span>
               </b-button>
             </div>
-            <div v-if="!isEnded" class="text-center">
+            <div v-if="isEnded" class="text-center">
               Sorry, the poll is ended.
             </div>
             <div v-if="!isStarted" class="text-center">
@@ -250,15 +270,28 @@
                 let balance = await app.scrypta.get('/balance/' + voteCard)
                 if(balance.balance >= 0.0011){
                   app.isUploading = true
-                  let send = await app.scrypta.post('/send',{
-                    from: voteCard,
-                    to: app.pollAddress,
-                    amount: 0.0001,
-                    private_key: voteCardPrivKey,
-                    message: 'poll://VOTE:' + index
-                  })
+                  let sendsuccess = false
+                  let send
+                  let yyy = 0
+                  while(!sendsuccess){
+                    send = await app.scrypta.post('/send',{
+                      from: voteCard,
+                      to: app.pollAddress,
+                      amount: 0.0001,
+                      private_key: voteCardPrivKey,
+                      message: 'poll://VOTE:' + index
+                    })
+                    if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){
+                      sendsuccess = true
+                    }
+                    if(yyy > 19){
+                      sendsuccess = true
+                      send = false
+                    }
+                    yyy++
+                  }
 
-                  if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){  
+                  if(sendsuccess){  
                     app.$buefy.toast.open({
                       message: 'Voted sent correctly, you will see the results when the poll is ended!',
                       type: 'is-success'

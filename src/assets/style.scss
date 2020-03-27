@@ -40,6 +40,11 @@ body, html, .button{
     font-family: "Sen"!important;
 }
 
+.social-shares span:hover{
+    cursor:pointer!important;
+    opacity:0.4!important;
+}
+
 .main{
     min-height: 70vh;
 }
