@@ -3,37 +3,26 @@
     <div class="container">
         <h1>Manage poll</h1>
         <h3>{{ pollAddress }}</h3>
-        <social-sharing url="https://vuejs.org/" inline-template>
-        <div>
-          <network network="facebook">
-            <i class="fa fa-fw fa-facebook"></i> Facebook
-          </network>
-          <network network="googleplus">
-            <i class="fa fa-fw fa-google-plus"></i> Google +
-          </network>
-          <network network="linkedin">
-            <i class="fa fa-fw fa-linkedin"></i> LinkedIn
-          </network>
-          <network network="pinterest">
-            <i class="fa fa-fw fa-pinterest"></i> Pinterest
-          </network>
-          <network network="reddit">
-            <i class="fa fa-fw fa-reddit"></i> Reddit
-          </network>
-          <network network="twitter">
-            <i class="fa fa-fw fa-twitter"></i> Twitter
-          </network>
-          <network network="vk">
-            <i class="fa fa-vk"></i> VKontakte
-          </network>
-          <network network="weibo">
-            <i class="fa fa-weibo"></i> Weibo
-          </network>
-          <network network="whatsapp">
-            <i class="fa fa-fw fa-whatsapp"></i> Whatsapp
-          </network>
-        </div>
-      </social-sharing>
+        <social-sharing :url="'https://polls.scryptachain.org/#/poll/' + $route.params.uuid" inline-template>
+          <div class="social-shares">
+            <b>Share on: </b>
+            <network network="linkedin">
+              <i class="fa fa-fw fa-linkedin"></i> LinkedIn
+            </network>
+            <network network="reddit">
+              <i class="fa fa-fw fa-reddit"></i> Reddit
+            </network>
+            <network network="twitter">
+              <i class="fa fa-fw fa-twitter"></i> Twitter
+            </network>
+            <network network="telegram">
+              <i class="fa fa-telegram"></i> Telegram
+            </network>
+            <network network="whatsapp">
+              <i class="fa fa-fw fa-whatsapp"></i> Whatsapp
+            </network>
+          </div>
+        </social-sharing>
         <hr>
         <div v-if="isLoading">Loading poll from the blockchain...</div>
         <div v-if="!isLoading && !isDecrypted">
@@ -199,6 +188,9 @@
           app.authorized.push(response.data[0].data.authorized[y].address)
           app.accepted[response.data[0].data.authorized[y].address] = true
         }
+        for(let y in app.poll.answers){
+          app.votes[y] = 0
+        }
         app.pollAddress = response.data[0].address
         if(app.dna.owner === app.address){
           if(app.dna.type === "SECRET"){
@@ -209,6 +201,9 @@
 
               if(decrypted !== false){
                 app.poll = JSON.parse(JSON.parse(decrypted))
+                for(let y in app.poll.answers){
+                  app.votes[y] = 0
+                }
                 app.isDecrypted = true
                 await app.fetchStats()
               }else{
@@ -251,6 +246,9 @@
                     })
                     app.isDecrypted = true
                     app.poll = JSON.parse(JSON.parse(decrypted))
+                    for(let y in app.poll.answers){
+                      app.votes[y] = 0
+                    }
                     await app.fetchStats()
                     let start = moment(app.poll.start_date + 'T' + app.poll.start_time + ':00')
                     let end = moment(app.poll.end_date + 'T' + app.poll.end_time + ':00')
@@ -371,7 +369,7 @@
                                 private_key: key.prv,
                                 message: 'poll://AUTH:' +  selected[x] + ':' + encrypted
                               })
-                              if(send.data.txid !== undefined && send.data.txid.length === 64){
+                              if(send.data.txid !== undefined && send.data.txid !== null && send.data.txid.length === 64){
                                 sendcard = true
                               }
                               if(yy > 19){
@@ -508,6 +506,7 @@
           for(let x in app.poll.answers){
             app.votes[x] = 0
           }
+          
           if(exp[0] === 'poll' && exp[1] === '//VOTE'){
             if(app.votes[exp[2]]){
               app.votes[exp[2]] ++
@@ -530,8 +529,7 @@
               })
               app.accepted[tx.sender] = true
             }
-          }
-          
+          }    
           if(app.dna.votetype === 'PUBLIC' && exp[1] === '//AUTHREQUEST' && app.dna.type === 'AUTHORIZED'){
             app.requestedAuth.push(tx.sender)
             app.accepted[tx.sender] = true

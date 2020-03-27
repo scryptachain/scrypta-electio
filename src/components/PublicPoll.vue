@@ -29,6 +29,9 @@
                     <div v-if="isJoined && poll.data.dna.type === 'AUTHORIZED' && poll.data.dna.votetype === 'PUBLIC' && poll.data.dna.owner !== address">
                         <a :href="'/#/poll/' + poll.uuid"><b-button type="is-success" class="float-btn">Enter</b-button></a>
                     </div>
+                    <div v-if="isJoined && poll.data.dna.type === 'AUTHORIZED' && poll.data.dna.votetype === 'SECRET' && isJoined && poll.data.dna.owner !== address">
+                        <a :href="'/#/poll/' + poll.uuid"><b-button type="is-success" class="float-btn">Enter</b-button></a>
+                    </div>
                     <div v-if="poll.data.dna.type === 'PUBLIC' && poll.data.dna.owner !== address">
                         <a :href="'/#/poll/' + poll.uuid"><b-button type="is-success" class="float-btn">Enter</b-button></a>
                     </div>
