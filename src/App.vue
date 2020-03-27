@@ -16,7 +16,7 @@
         <template slot="end">
           <b-navbar-item tag="div">
             <div class="buttons">
-              <a v-on:click="logoutUser" class="button is-primary">
+              <a v-on:click="logout" class="button is-primary">
                 <strong>Logout</strong>
               </a>
             </div>
@@ -231,7 +231,7 @@ export default {
       const app = this;
       app.showCreateModal = true;
     },
-    logoutUser() {
+    logout() {
       localStorage.setItem("SID", "");
       location.reload();
     },
