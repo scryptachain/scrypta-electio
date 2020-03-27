@@ -60,7 +60,16 @@
             <h2 class="subtitle">
               Poll system will allow you to create and manage polls, linked forever to the Scrypta Blockchain.<br>
               You can enter with ScryptaID extension or just create a new identity.<br><br>
-              Login with Scrypta ID Extension.
+              Login with Scrypta ID Extension or create a new wallet with <a href="https://web.manent.app">Manent Web</a> and load the .sid file here.<br><br>
+              <b-upload v-model="file"
+                v-on:input="loadWalletFromFile"
+                drag-drop>
+                <section class="section">
+                    <div class="content has-text-centered">
+                        <p>Drop your .sid file here or click to upload</p>
+                    </div>
+                </section>
+              </b-upload>
             </h2>
           </div>
         </div>
@@ -126,6 +135,7 @@
         address: '',
         wallet: '',
         isLogging: true,
+        file: [],
         needsRSA: false,
         isCreating: false,
         isUpdating: false,
@@ -152,6 +162,36 @@
       }
     },
     methods: {
+      loadWalletFromFile() {
+        const app = this
+        const file = app.file;
+        const reader = new FileReader();
+        reader.onload = function() {
+          var dataKey = reader.result
+
+          app.$buefy.dialog.prompt({
+            message: `Enter wallet password`,
+            inputAttrs: {
+                type: 'password'
+            },
+            trapFocus: true,
+            onConfirm: async (password) => {
+              let key = await app.scrypta.readKey(password,dataKey)
+              if(key !== false){
+                app.scrypta.importPrivateKey(key.prv, password)
+                localStorage.setItem('SID', dataKey)
+                location.reload()
+              }else{
+                app.$buefy.toast.open({
+                  message: 'Wrong password!',
+                  type: 'is-danger'
+                })
+              }
+            }
+          })
+        };
+        reader.readAsText(file);
+      },
       showCreate(){
         const app = this
         app.showCreateModal = true
