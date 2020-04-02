@@ -240,98 +240,10 @@
               </div>
             </div>
           </div>
-
-          <!-- Qua inizia la parte da spostare in un altra pagina -->
-
-          <div class="container" style="margin-top:50px;">
-            <div class="card">
-              <div style="padding: 50px 20px;">
-                <h1 class="title is-1">Start Now</h1>
-                <br />
-                <h2 class="subtitle">
-                  Scrypta Electio ti permette di creare e gestire votazioni e sondaggi utilizzando la blockchain di Scrypta
-                  <br />Puoi accedere con Scrypta ID extension o creando una nuova identità
-                  <br />
-                  <br />Accedi con Scrypta ID Extension o crea un nuovo wallet con
-                  <a
-                    href="https://web.manent.app"
-                  >Manent Web</a> e fai l'upload del file .sid qui.
-                  <br />
-                  <br />
-                  <b-upload v-model="file" v-on:input="loadWalletFromFile" drag-drop>
-                    <section class="section">
-                      <div class="content has-text-centered">
-                        <p>Trascina il tuo file .sid here or clicca su upload</p>
-                      </div>
-                    </section>
-                  </b-upload>
-                </h2>
-              </div>
-            </div>
-            <br />Scrypta Electio is an
-            <a
-              href="https://github.com/scryptachain/scrypta-polls"
-              target="_blank"
-            >open-source</a> project by
-            <a href="https://scrypta.foundation" target="_blank">Scrypta Foundation</a>.
-            <br />
-            <br />
-          </div>
         </div>
       </section>
     </div>
     <b-loading :is-full-page="true" :active.sync="isLogging" :can-cancel="false"></b-loading>
-    <b-modal :active.sync="showCreateModal" has-modal-card trap-focus aria-role="dialog" aria-modal>
-      <form action>
-        <div class="modal-card" style="width: auto">
-          <header class="modal-card-head">
-            <p v-if="!wallet" class="modal-card-title">Create new Identity</p>
-            <p v-if="wallet" class="modal-card-title">Update Identity</p>
-          </header>
-          <section class="modal-card-body">
-            <b-field label="Insert Password">
-              <b-input
-                type="password"
-                v-model="password"
-                password-reveal
-                placeholder="Your main password"
-                required
-              ></b-input>
-            </b-field>
-
-            <b-field v-if="!wallet" label="Repeat password">
-              <b-input
-                type="password"
-                v-model="passwordrepeat"
-                password-reveal
-                placeholder="Repeat password"
-                required
-              ></b-input>
-            </b-field>
-          </section>
-          <footer v-if="!isCreating && !isUpdating" class="modal-card-foot">
-            <button
-              v-if="!wallet"
-              class="button is-primary"
-              style="width:100%"
-              v-on:click="createUser"
-            >CREATE</button>
-            <button
-              v-if="wallet"
-              class="button is-primary"
-              style="width:100%"
-              v-on:click="updateUser"
-            >UPDATE</button>
-          </footer>
-          <footer v-if="isCreating" class="modal-card-foot">
-            <div style="text-align:center">Creating identity, please wait...</div>
-          </footer>
-          <footer v-if="isUpdating" class="modal-card-foot">
-            <div style="text-align:center">Updating identity, please wait...</div>
-          </footer>
-        </div>
-      </form>
-    </b-modal>
   </div>
 </template>
 
@@ -344,14 +256,7 @@ export default {
       scrypta: new ScryptaCore(true),
       address: "",
       wallet: "",
-      isLogging: true,
-      file: [],
-      needsRSA: false,
-      isCreating: false,
-      isUpdating: false,
-      showCreateModal: false,
-      password: "",
-      passwordrepeat: ""
+      isLogging: true
     };
   },
   async mounted() {
