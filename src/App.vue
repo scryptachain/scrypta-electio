@@ -71,94 +71,186 @@
       <section class="hero">
         <div class="hero-body" style="padding: 0;">
           <div style="min-height: 100vh; background-image: url('bg-home.jpg');">
-            <div class="container">
-              <img src="/logo.png" width="250" style="margin-top: 50px;" />
-              <h1 style="margin-top: 20px;">Poll system over the blockchain</h1>
-              <h2 class="subtitle">
-                Electio è una piattaforma creata per il voto elettronico. La blockchain decentralizzata e permissionless di Scrypta permette un alto livello di trasparenza, sicurezza e affidabilità in tutte le fasi del voto.
-              </h2>
+            <div class="container" style="min-height: 100vh;">
+              <div class="center-home">
+                <div class="columns">
+                  <div class="column is-three-fifths is-offset-one-fifth">
+                    <img src="/logo.png" width="350" style="margin-top: 50px;" />
+                    <h1 style="margin-top: 20px;">Poll system over the blockchain</h1>
+                    <h2 class="subtitle">
+                      <i>
+                        Electio è una piattaforma creata per il voto elettronico. La blockchain decentralizzata e permissionless
+                        di Scrypta permette un alto livello di trasparenza, sicurezza e affidabilità in tutte le fasi del voto.
+                      </i>
+                    </h2>
+                  </div>
+                </div>
+              </div>
+              <div style="width: 100%; position: absolute; bottom: 0; left: 0;">
+                <p style="margin-top:30px;">ESPLORA</p>
+                <a href="#create">
+                  <b-icon pack="fas" icon="chevron-down"></b-icon>
+                </a>
+              </div>
+            </div>
+          </div>
 
-              <div class="columns" style="margin-top: 100px;">
-                <div class="column">
+          <div class="section" style="min-height: 100vh; background-color: #313A40;" id="create">
+            <div class="middle">
+              <h1 style="color: white;">VOTO CON AUTORIZZAZIONE</h1>
+              <br />
+              <div class="columns is-centered">
+                <div class="column is-5">
                   <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="auth1.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
+                    </div>
                     <div class="card-content">
                       <div class="media">
-                        <div class="media-left"></div>
                         <div class="media-content">
-                          <p class="title is-2 text-center">Voto con autorizzazione</p>
+                          <p class="title text-center">Quesito pubblico / Voto Segreto</p>
                         </div>
                       </div>
 
                       <div class="content">
-                        <strong>Quesito pubblico con autorizzazione / Voto Segreto</strong>
-                        <br />Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore, che viene autorizzato a votare dal creatore del quesito, è segreto.
-                        <br />
-                        <br />
-                        <strong>Quesito pubblico con autorizzazione / Voto palese</strong>
-                        <br />Il quesito della votazione è visualizzabile in chiaro; il voto dell’elettore, che viene autorizzato a votare dal creatore del quesito, è palese.
+                        Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore,
+                        che viene autorizzato a votare dal creatore del quesito, è segreto.
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <div class="column">
+                <div class="column is-5">
                   <div class="card">
-                    <div class="card-content">
-                      <div class="media">
-                        <div class="media-left"></div>
-                        <div class="media-content">
-                          <p class="title is-2 text-center">Quesito Pubblico (sondaggistica)</p>
-                        </div>
-                      </div>
-
-                      <div class="content">
-                        <strong>Quesito pubblico / Voto Palese</strong>
-                        <br />Il quesito della votazione è visualizzabile in chiaro, il voto dell’elettore è in chiaro e tutti possono votare senza autorizzazione. utile per fini di sondaggio.
-                      </div>
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="auth2.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
                     </div>
-                  </div>
-                </div>
-
-                <div class="column">
-                  <div class="card">
                     <div class="card-content">
                       <div class="media">
-                        <div class="media-left"></div>
                         <div class="media-content">
-                          <p class="title is-2 text-center">Quesito Segreto</p>
+                          <p class="title text-center">Quesito pubblico / Voto palese</p>
                         </div>
                       </div>
-
                       <div class="content">
-                        <strong>Quesito segreto / Voto Palese</strong>
-                        <br />Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore, che viene pre-autorizzato a votare dal creatore del quesito, è palese (non segreto).
-                        <br />
-                        <br />
-                        <strong>Quesito segreto / Voto Segreto</strong>
-                        <br />Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore, che viene pre-autorizzato a votare dal creatore del quesito, è segreto
+                        Il quesito della votazione è visualizzabile in chiaro; il voto dell’elettore,
+                        che viene autorizzato a votare dal creatore del quesito, è palese
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div style="width: 100%; position: absolute; botton: 0; left: 0;">
-              <p style="margin-top:30px;">START NOW</p>
-              <a href="#create">
-                <b-icon pack="fas" icon="chevron-down"></b-icon>
-              </a>
+          </div>
+
+          <div class="section" style="min-height: 100vh; background-color: #2D353B">
+            <div class="container">
+              <h1 style="color: white;">QUESITO PUBBLICO</h1>
+              <div class="subtitle" style="color: white;"><i>Sondaggistica</i></div>
+              <div class="columns">
+                <div class="column is-10 is-offset-1">
+                  <div class="card is-horizontal center">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="sondaggio.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
+                    </div>
+                    <div class="card-stacked">
+                      <div class="card-content">
+                        <div class="media">
+                          <div class="media-content">
+                            <p class="title text-center">Quesito pubblico / Voto Palese</p>
+                          </div>
+                        </div>
+                        <div class="content">
+                          Il quesito della votazione è visualizzabile in chiaro, il voto dell’elettore è in chiaro e
+                          tutti possono votare senza autorizzazione. utile per fini di sondaggio.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="container" id="create" style="margin-top:50px;">
+
+          <div class="section" style="min-height: 100vh; background-color: #293035">
+            <div class="middle">
+              <h1 style="color: white;">QUESITO SEGRETO</h1>
+              <br />
+              <div class="columns is-centered">
+                <div class="column is-5">
+                  <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="secret1.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
+                    </div>
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-content">
+                          <p class="title text-center">Quesito segreto / Voto Palese</p>
+                        </div>
+                      </div>
+
+                      <div class="content">
+                        Il quesito della votazione è visualizzabile solo attraverso password dedicata,
+                        il voto dell’elettore, che viene pre-autorizzato a votare dal creatore del quesito, è palese (non segreto).
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column is-5">
+                  <div class="card">
+                    <div class="card-image">
+                      <figure class="image is-4by3">
+                        <img
+                          src="secret2.png"
+                          alt="Placeholder image"
+                        />
+                      </figure>
+                    </div>
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-content">
+                          <p class="title text-center">Quesito segreto / Voto Segreto</p>
+                        </div>
+                      </div>
+                      <div class="content">
+                        Il quesito della votazione è visualizzabile solo attraverso password dedicata, il voto dell’elettore,
+                        che viene pre-autorizzato a votare dal creatore del quesito, è segreto.<br><br>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="container" style="margin-top:50px;">
             <div class="card">
               <div style="padding: 50px 20px;">
                 <h1 class="title is-1">Start Now</h1>
                 <br />
                 <h2 class="subtitle">
-                  Scrypta Electio  ti permette di creare e gestire votazioni e sondaggi utilizzando la blockchain di Scrypta
+                  Scrypta Electio ti permette di creare e gestire votazioni e sondaggi utilizzando la blockchain di Scrypta
                   <br />Puoi accedere con Scrypta ID extension o creando una nuova identità
                   <br />
-                  <br />Accedi con  Scrypta ID Extension o crea un nuovo wallet con
+                  <br />Accedi con Scrypta ID Extension o crea un nuovo wallet con
                   <a
                     href="https://web.manent.app"
                   >Manent Web</a> e fai l'upload del file .sid qui.
@@ -429,5 +521,44 @@ export default {
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+.center-home {
+  position: absolute;
+  top: 45%;
+  -moz-transform: translateY(-45%);
+  -webkit-transform: translateY(-45%);
+  transform: translateY(-45%);
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 36%;
+}
+
+.section {
+  display: flex;
+}
+
+.middle {
+  margin: auto;
+}
+
+.is-horizontal {
+  display: flex;
+}
+.card-image {
+  width: 100%;
+  height: 100%;
+}
+.card-stacked {
+  flex-direction: column;
+  flex: 1 1 auto;
+  display: flex;
+  position: relative;
+}
+.card-content {
+  flex-grow: 1;
 }
 </style>
