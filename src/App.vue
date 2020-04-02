@@ -97,7 +97,7 @@
 
           <div class="section" style="min-height: 100vh; background-color: white;" id="create">
             <div class="middle">
-              <h1 style="color: white;">VOTO CON AUTORIZZAZIONE</h1>
+              <h1>VOTO CON AUTORIZZAZIONE</h1>
               <br />
               <div class="columns is-centered">
                 <div class="column is-5">
@@ -153,8 +153,8 @@
 
           <div class="section" style="min-height: 100vh; background-color: white">
             <div class="container">
-              <h1 style="color: white;">QUESITO PUBBLICO</h1>
-              <div class="subtitle" style="color: white;"><i>Sondaggistica</i></div>
+              <h1>QUESITO PUBBLICO</h1>
+              <div class="subtitle"><i>Sondaggistica</i></div>
               <div class="columns">
                 <div class="column is-10 is-offset-1">
                   <div class="card is-horizontal center">
@@ -187,7 +187,7 @@
 
           <div class="section" style="min-height: 100vh; background-color: white">
             <div class="middle">
-              <h1 style="color: white;">QUESITO SEGRETO</h1>
+              <h1>QUESITO SEGRETO</h1>
               <br />
               <div class="columns is-centered">
                 <div class="column is-5">
