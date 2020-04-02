@@ -241,6 +241,8 @@
             </div>
           </div>
 
+          <!-- Qua inizia la parte da spostare in un altra pagina -->
+
           <div class="container" style="margin-top:50px;">
             <div class="card">
               <div style="padding: 50px 20px;">
