@@ -46,6 +46,7 @@
                 <span v-if="parseFloat(userVote) === parseFloat(index)"> X </span> {{ answer.answer }}: <span v-if="votes[index]">{{votes[index]}}</span><span v-if="!votes[index]">0</span> <span style="font-weight:normal" v-if="votes[index] === 1">VOTE</span><span  style="font-weight:normal"  v-if="votes[index] !== 1">VOTES</span>
               </b-button>
             </div>
+            <br>
             <div v-if="isEnded" class="text-center">
               Sorry, the poll is ended.
             </div>
