@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#3ed2a7">
+    <meta name="author" content="Scrypta Foundation">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://electio.app">
+    <meta property="og:title" content="Scrypta Electio">
+    <meta name="description" content="Electio è una piattaforma creata per il voto elettronico. La blockchain
+	decentralizzata e permissionless di Scrypta permette un alto livello di
+	trasparenza, sicurezza e affidabilità in tutte le fasi del voto.">
+    <meta property="og:image" content="main_slide.jpg" />
+
+    <link rel="shortcut icon" href="./favicon.png" />
+
+    <title>Scrypta Electio | Polls over the Blockchain</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.css" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="assets/vendors/liquid-icon/liquid-icon.min.css" />
+    <link rel="stylesheet" href="assets/vendors/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="assets/css/theme-vendors.min.css" />
+    <link rel="stylesheet" href="assets/css/theme.min.css" />
+    <link rel="stylesheet" href="assets/css/themes/lookbook.css" />
+
+
+    <!-- Head Libs -->
+    <script async src="assets/vendors/modernizr.min.js"></script>
+
+</head>
+
+<body class="lqd-stack-buttons-style-1 header-style-side lqd-stack-effect-slideOver"
+    data-mobile-nav-trigger-alignment="right" data-mobile-nav-align="left" data-mobile-nav-style="minimal"
+    data-mobile-nav-shceme="gray" data-mobile-header-scheme="gray" data-mobile-nav-breakpoint="1199">
+
+    <div id="wrap">
+
+        <header class="main-header header-fullscreen header-fullscreen-style-1 main-header-overlay">
+
+            <div class="mainbar-wrap">
+                <div class="megamenu-hover-bg"></div><!-- /.megamenu-hover-bg -->
+                <div class="container-fluid mainbar-container">
+                    <div class="mainbar">
+                        <div class="row mainbar-row align-items-lg-stretch px-4">
+
+                            <div class="col">
+                                <div class="navbar-header">
+                                    <a class="navbar-brand" href="#" rel="home">
+                                        <span class="navbar-brand-inner">
+                                            <img class="logo-dark" src="assets/img/electio_256.png">
+                                            <img class="logo-light" src="assets/img/electio_256_white.png">
+                                            <img class="logo-sticky" src="assets/img/electio_256_white.png">
+                                            <img class="mobile-logo-default" src="assets/img/electio_256.png">
+                                            <img class="logo-default logo_desk" src="assets/img/electio_256.png">
+                                        </span>
+                                    </a>
+                                    <button type="button"
+                                        class="navbar-toggle collapsed nav-trigger scheme-light style-mobile"
+                                        data-toggle="collapse" data-target="#main-header-collapse" aria-expanded="false"
+                                        data-changeclassnames='{ "html": "mobile-nav-activated overflow-hidden" }'>
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="bars">
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                        </span>
+                                    </button>
+                                </div><!-- /.navbar-header -->
+                            </div><!-- /.col -->
+
+                            <div class="col text-right">
+
+                                <div class="header-module">
+                                    <button
+                                        class="nav-trigger collapsed style-1 fill-solid scheme-light txt-left main-nav-trigger"
+                                        role="button" type="button" data-toggle="collapse"
+                                        data-target="#main-header-collapse" aria-expanded="false"
+                                        aria-controls="main-header-collapse"
+                                        data-changeclassnames='{ "html": "overflow-hidden" }'>
+                                        <span class="bars">
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                            <span class="bar"></span>
+                                        </span>
+                                        <span class="txt">Menu</span>
+                                    </button>
+                                </div><!-- /.header-module -->
+
+                                <div class="collapse navbar-collapse navbar-fullscreen" id="main-header-collapse"
+                                    aria-expanded="false" role="tablist">
+
+                                    <div class="header-module">
+                                        <ul class="lqd-custom-menu lqd-lang-module reset-ul">
+                                            <li>
+                                                <a class="text-hover-white" title="English" href="/en/">
+                                                    <img src="assets/img/usa.png" alt="en" title="English">
+                                                    <span>English</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div><!-- /.header-module -->
+
+                                    <ul
+                                        class="main-nav main-nav-hover-underline-1 nav align-items-lg-stretch justify-content-lg-center main-nav-hover-underline-1 main-nav-fullscreen-style-1">
+                                        <li>
+                                            <a href="/">
+                                                <span class="link-icon"></span>
+                                                <span class="link-txt">
+                                                    <span class="link-ext"></span>
+                                                    <span class="txt">Home</span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://vote.electio.app">
+                                                <span class="link-icon"></span>
+                                                <span class="link-txt">
+                                                    <span class="link-ext"></span>
+                                                    <span class="txt">Crea la tua Poll</span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://me.scrypta.id">
+                                                <span class="link-icon"></span>
+                                                <span class="link-txt">
+                                                    <span class="link-ext"></span>
+                                                    <span class="txt">Crea la tua Scrypta ID</span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://it.scrypta.wiki/dapps/electio.html">
+                                                <span class="link-icon"></span>
+                                                <span class="link-txt">
+                                                    <span class="link-ext"></span>
+                                                    <span class="txt">Documentazione</span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <!--desktop social-->
+                                    <div class="desk_menu header-module">
+                                        <ul class="social-icon scheme-white social-icon-md">
+                                            <li>
+                                                <a href="https://github.com/scryptachain/" target="_blank">
+                                                    <i class="fa fa-github"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://www.facebook.com/scryptafoundation" target="_blank">
+                                                    <i class="fa fa-facebook"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://twitter.com/scryptachain" target="_blank">
+                                                    <i class="fa fa-twitter"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://www.linkedin.com/company/scrypta-foundation/"
+                                                    target="_blank">
+                                                    <i class="fa fa-linkedin"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://t.me/scryptachain_official" target="_blank">
+                                                    <i class="fa fa-telegram"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://medium.com/@scryptachain" target="_blank">
+                                                    <i class="fa fa-medium"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://discord.gg/8mfDRVK" target="_blank">
+                                                    <i class="fab fa-discord"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://wiki-it.scryptachain.org/" target="_blank">
+                                                    <i class="fab fa-wikipedia-w"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://www.youtube.com/channel/UCOANBiYyULoZwmaxjvOnM4Q"
+                                                    target="_blank">
+                                                    <i class="fa fa-youtube"></i>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!--END | desktop social-->
+
+                                    <!--mobile social-->
+                                    <div class="mobile_menu header-module">
+                                        <ul class="social-icon scheme-white social-icon-md">
+                                            <li>
+                                                <a href="https://github.com/scryptachain/" target="_blank">
+                                                    <i class="fa fa-github"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://twitter.com/scryptachain" target="_blank">
+                                                    <i class="fa fa-twitter"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://www.linkedin.com/company/scrypta-foundation/"
+                                                    target="_blank">
+                                                    <i class="fa fa-linkedin"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://t.me/scryptachain_official" target="_blank">
+                                                    <i class="fa fa-telegram"></i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://discord.gg/8mfDRVK" target="_blank">
+                                                    <i class="fab fa-discord"></i>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!--END | mobile social-->
+
+                                </div><!-- /.collapse -->
+
+                            </div><!-- /.col -->
+
+                        </div><!-- /.mainbar-row -->
+                    </div><!-- /.mainbar -->
+                </div><!-- /.mainbar-container -->
+            </div><!-- /.mainbar-wrap -->
+
+        </header><!-- /.main-header -->
+
+        <main id="content" class="content" data-liquid-stack="true"
+            data-stack-options='{"navigation":false, "prevNextButtons":false, "pageNumber":true, "prevNextLabels":{"prev":"Previous", "next":"Next"}, "effect":"slideOver", "disableOnMobile: true"}'>
+
+            <!-- main slide-->
+            <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
+
+                <div class="lqd-particles-bg-wrap">
+
+                    <div class="ld-particles-container">
+                        <div class="ld-particles-inner" id="ld-particles-1" data-particles="true"
+                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#b9dee2","#ffe3dd"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
+                        </div><!-- /.ld-particles-inner -->
+                    </div><!-- /.ld-particles-container -->
+
+                </div><!-- /.lqd-particles-bg-wrap -->
+
+                <div class="container">
+                    <div class="row">
+                        <div class="lqd-column col-xs-12">
+
+                            <div class="lqd-promo-wrap lqd-promo-alt lqd-promo-reverse">
+                                <div class="lqd-promo-inner">
+
+                                    <div class="lqd-promo-img">
+                                        <div class="lqd-promo-img-inner" data-reveal="true"
+                                            data-reveal-options='{ "direction": "rl", "bgcolor": "#fff", "revealSettings": { "duration": 800, "onCoverAnimations": { "scale": [2, 1] } } }'>
+                                            <figure>
+                                                <img src="./assets/img/main_slide.jpg" alt="Promo">
+                                            </figure>
+                                        </div><!-- /.lqd-promo-img-inner -->
+                                    </div><!-- /.lqd-promo-img -->
+
+                                    <div class="lqd-promo-content" data-custom-animations="true"
+                                        data-ca-options='{ "triggerHandler": "inview", "animationTarget": ".btn", "duration": 800, "startDelay": 900, "initValues": { "translateY": 30, "opacity": 0 }, "animations": { "translateY": 0, "opacity": 1 } }'>
+                                        <h2 data-split-text="true" data-split-options='{ "type": "chars, words" }'
+                                            data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "all-childs", "duration": 800, "startDelay": 300, "delay": 25, "initValues": { "translateY": 25, "translateX": 15, "rotate": 12, "opacity": 0 }, "animations": { "translateY": 0, "translateX": 0, "rotate": 0, "opacity": 1 } }'>
+                                            Il Voto su Blockchain</h2>
+                                        <p>Electio è una piattaforma creata per il voto elettronico. La blockchain
+                                            decentralizzata e permissionless di Scrypta permette un alto livello di
+                                            trasparenza, sicurezza e affidabilità in tutte le fasi del voto.</p>
+                                        <a href="#" class="btn btn-split text-uppercase font-size-14 font-weight-bold">
+                                            <span>
+                                                <span class="btn-split-bg"></span>
+                                                <span class="btn-txt">Crea la tua poll</span>
+                                            </span>
+                                        </a>
+                                    </div><!-- /.lqd-promo-content -->
+
+                                </div><!-- /.lqd-promo-inner -->
+                            </div><!-- /.lqd-promo-wrap -->
+
+                        </div><!-- /.lqd-column col-xs-12 -->
+                    </div><!-- /.row -->
+                </div><!-- /.container -->
+
+            </section>
+            <!-- /. main slide -->
+
+            <!-- slide 1-->
+            <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
+
+                <div class="lqd-particles-bg-wrap">
+
+                    <div class="ld-particles-container">
+                        <div class="ld-particles-inner" id="ld-particles-2" data-particles="true"
+                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#b9dee2","#ffe3dd"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
+                        </div><!-- /.ld-particles-inner -->
+                    </div><!-- /.ld-particles-container -->
+
+                </div><!-- /.lqd-particles-bg-wrap -->
+
+                <div class="container">
+                    <div class="row">
+                        <div class="lqd-column col-xs-12">
+
+                            <div class="lqd-promo-wrap lqd-promo-alt lqd-promo-reverse">
+                                <div class="lqd-promo-inner">
+
+                                    <div class="lqd-promo-img">
+                                        <div class="lqd-promo-img-inner" data-reveal="true"
+                                            data-reveal-options='{ "direction": "rl", "bgcolor": "#fff", "revealSettings": { "duration": 800, "onCoverAnimations": { "scale": [2, 1] } } }'>
+                                            <figure>
+                                                <img src="./assets/img/public-vote1.jpg" alt="Promo">
+                                            </figure>
+                                        </div><!-- /.lqd-promo-img-inner -->
+                                    </div><!-- /.lqd-promo-img -->
+
+                                    <div class="lqd-promo-content" data-custom-animations="true"
+                                        data-ca-options='{ "triggerHandler": "inview", "animationTarget": ".btn", "duration": 800, "startDelay": 900, "initValues": { "translateY": 30, "opacity": 0 }, "animations": { "translateY": 0, "opacity": 1 } }'>
+                                        <div class="lqd-promo-cat" data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "li", "duration": 800, "delay": 100, "initValues": { "translateX": 15, "opacity": 0 }, "animations": { "translateX": 0, "opacity": 1 } }'>
+                                            <ul class="reset-ul comma-sep-li inline-nav text-uppercase">
+                                                <li>Quesito Pubblico</li>
+                                            </ul>
+                                        </div><!-- /.lqd-promo-cat -->
+                                        <h2 data-split-text="true" data-split-options='{ "type": "chars, words" }'
+                                            data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "all-childs", "duration": 800, "startDelay": 300, "delay": 25, "initValues": { "translateY": 25, "translateX": 15, "rotate": 12, "opacity": 0 }, "animations": { "translateY": 0, "translateX": 0, "rotate": 0, "opacity": 1 } }'>
+                                            Voto Segreto</h2>
+                                        <p>Il quesito della votazione è visualizzabile solo attraverso password
+                                            dedicata, il voto dell’elettore, che viene autorizzato a votare dal creatore
+                                            del quesito, è segreto.</p>
+                                    </div><!-- /.lqd-promo-content -->
+
+                                </div><!-- /.lqd-promo-inner -->
+                            </div><!-- /.lqd-promo-wrap -->
+
+                        </div><!-- /.lqd-column col-xs-12 -->
+                    </div><!-- /.row -->
+                </div><!-- /.container -->
+
+            </section>
+            <!-- /. slide 1 -->
+
+            <!-- slide 2 -->
+            <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
+
+                <div class="lqd-particles-bg-wrap">
+
+                    <div class="ld-particles-container">
+                        <div class="ld-particles-inner" id="ld-particles-3" data-particles="true"
+                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#dfe8cb","#f9d7cc"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
+                        </div><!-- /.ld-particles-inner -->
+                    </div><!-- /.ld-particles-container -->
+
+                </div><!-- /.lqd-particles-bg-wrap -->
+
+                <div class="container">
+                    <div class="row">
+                        <div class="lqd-column col-xs-12">
+
+                            <div class="lqd-promo-wrap lqd-promo-alt lqd-promo-reverse">
+                                <div class="lqd-promo-inner">
+
+                                    <div class="lqd-promo-img">
+                                        <div class="lqd-promo-img-inner" data-reveal="true"
+                                            data-reveal-options='{ "direction": "rl", "bgcolor": "#fff", "revealSettings": { "duration": 800, "onCoverAnimations": { "scale": [2, 1] } } }'>
+                                            <figure>
+                                                <img src="./assets/img/public-vote2.jpg" alt="Promo">
+                                            </figure>
+                                        </div><!-- /.lqd-promo-img-inner -->
+                                    </div><!-- /.lqd-promo-img -->
+
+                                    <div class="lqd-promo-content" data-custom-animations="true"
+                                        data-ca-options='{ "triggerHandler": "inview", "animationTarget": ".btn", "duration": 800, "startDelay": 900, "initValues": { "translateY": 30, "opacity": 0 }, "animations": { "translateY": 0, "opacity": 1 } }'>
+                                        <div class="lqd-promo-cat" data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "li", "duration": 800, "delay": 100, "initValues": { "translateX": 15, "opacity": 0 }, "animations": { "translateX": 0, "opacity": 1 } }'>
+                                            <ul class="reset-ul comma-sep-li inline-nav text-uppercase">
+                                                <li>Quesito Pubblico</li>
+                                            </ul>
+                                        </div><!-- /.lqd-promo-cat -->
+                                        <h2 data-split-text="true" data-split-options='{ "type": "chars, words" }'
+                                            data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "all-childs", "duration": 800, "startDelay": 300, "delay": 25, "initValues": { "translateY": 25, "translateX": 15, "rotate": 12, "opacity": 0 }, "animations": { "translateY": 0, "translateX": 0, "rotate": 0, "opacity": 1 } }'>
+                                            Voto Palese</h2>
+                                        <p>Il quesito della votazione è visualizzabile in chiaro; il voto dell’elettore,
+                                            che viene autorizzato a votare dal creatore del quesito, è palese</p>
+
+                                    </div><!-- /.lqd-promo-content -->
+
+                                </div><!-- /.lqd-promo-inner -->
+                            </div><!-- /.lqd-promo-wrap -->
+
+                        </div><!-- /.lqd-column col-xs-12 -->
+                    </div><!-- /.row -->
+                </div><!-- /.container -->
+
+            </section>
+            <!-- /. slide 2-->
+
+            <!-- slide 3 -->
+            <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
+
+                <div class="lqd-particles-bg-wrap">
+
+                    <div class="ld-particles-container">
+                        <div class="ld-particles-inner" id="ld-particles-5" data-particles="true"
+                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#fcdcd5","#e8e2be"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
+                        </div><!-- /.ld-particles-inner -->
+                    </div><!-- /.ld-particles-container -->
+
+                </div><!-- /.lqd-particles-bg-wrap -->
+
+                <div class="container">
+                    <div class="row">
+                        <div class="lqd-column col-xs-12">
+
+                            <div class="lqd-promo-wrap lqd-promo-alt lqd-promo-reverse">
+                                <div class="lqd-promo-inner">
+
+                                    <div class="lqd-promo-img">
+                                        <div class="lqd-promo-img-inner" data-reveal="true"
+                                            data-reveal-options='{ "direction": "rl", "bgcolor": "#fff", "revealSettings": { "duration": 800, "onCoverAnimations": { "scale": [2, 1] } } }'>
+                                            <figure>
+                                                <img src="./assets/img/vote3.jpg" alt="Promo">
+                                            </figure>
+                                        </div><!-- /.lqd-promo-img-inner -->
+                                    </div><!-- /.lqd-promo-img -->
+
+                                    <div class="lqd-promo-content" data-custom-animations="true"
+                                        data-ca-options='{ "triggerHandler": "inview", "animationTarget": ".btn", "duration": 800, "startDelay": 900, "initValues": { "translateY": 30, "opacity": 0 }, "animations": { "translateY": 0, "opacity": 1 } }'>
+                                        <div class="lqd-promo-cat" data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "li", "duration": 800, "delay": 100, "initValues": { "translateX": 15, "opacity": 0 }, "animations": { "translateX": 0, "opacity": 1 } }'>
+                                            <ul class="reset-ul comma-sep-li inline-nav text-uppercase">
+                                                <li>Quesito Pubblico</li>
+                                            </ul>
+                                        </div><!-- /.lqd-promo-cat -->
+                                        <h2 data-split-text="true" data-split-options='{ "type": "chars, words" }'
+                                            data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "all-childs", "duration": 800, "startDelay": 300, "delay": 25, "initValues": { "translateY": 25, "translateX": 15, "rotate": 12, "opacity": 0 }, "animations": { "translateY": 0, "translateX": 0, "rotate": 0, "opacity": 1 } }'>
+                                            Voto Pubblico</h2>
+                                        <p>Il quesito della votazione è visualizzabile in chiaro, il voto dell’elettore
+                                            è in chiaro e tutti possono votare senza autorizzazione. utile per fini di
+                                            sondaggio.</p>
+
+                                    </div><!-- /.lqd-promo-content -->
+
+                                </div><!-- /.lqd-promo-inner -->
+                            </div><!-- /.lqd-promo-wrap -->
+
+                        </div><!-- /.lqd-column col-xs-12 -->
+                    </div><!-- /.row -->
+                </div><!-- /.container -->
+
+            </section>
+            <!-- /. slide 3-->
+
+            <!-- slide 4-->
+            <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
+
+                <div class="lqd-particles-bg-wrap">
+
+                    <div class="ld-particles-container">
+                        <div class="ld-particles-inner" id="ld-particles-6" data-particles="true"
+                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#fcdcd5","#e8e2be"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
+                        </div><!-- /.ld-particles-inner -->
+                    </div><!-- /.ld-particles-container -->
+
+                </div><!-- /.lqd-particles-bg-wrap -->
+
+                <div class="container">
+                    <div class="row">
+                        <div class="lqd-column col-xs-12">
+
+                            <div class="lqd-promo-wrap lqd-promo-alt lqd-promo-reverse">
+                                <div class="lqd-promo-inner">
+
+                                    <div class="lqd-promo-img">
+                                        <div class="lqd-promo-img-inner" data-reveal="true"
+                                            data-reveal-options='{ "direction": "rl", "bgcolor": "#fff", "revealSettings": { "duration": 800, "onCoverAnimations": { "scale": [2, 1] } } }'>
+                                            <figure>
+                                                <img src="./assets/img/vote4.jpg" alt="Promo">
+                                            </figure>
+                                        </div><!-- /.lqd-promo-img-inner -->
+                                    </div><!-- /.lqd-promo-img -->
+
+                                    <div class="lqd-promo-content" data-custom-animations="true"
+                                        data-ca-options='{ "triggerHandler": "inview", "animationTarget": ".btn", "duration": 800, "startDelay": 900, "initValues": { "translateY": 30, "opacity": 0 }, "animations": { "translateY": 0, "opacity": 1 } }'>
+                                        <div class="lqd-promo-cat" data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "li", "duration": 800, "delay": 100, "initValues": { "translateX": 15, "opacity": 0 }, "animations": { "translateX": 0, "opacity": 1 } }'>
+                                            <ul class="reset-ul comma-sep-li inline-nav text-uppercase">
+                                                <li>Quesito Segreto</li>
+                                            </ul>
+                                        </div><!-- /.lqd-promo-cat -->
+                                        <h2 data-split-text="true" data-split-options='{ "type": "chars, words" }'
+                                            data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "all-childs", "duration": 800, "startDelay": 300, "delay": 25, "initValues": { "translateY": 25, "translateX": 15, "rotate": 12, "opacity": 0 }, "animations": { "translateY": 0, "translateX": 0, "rotate": 0, "opacity": 1 } }'>
+                                            Voto Palese</h2>
+                                        <p>Il quesito della votazione è visualizzabile solo attraverso password
+                                            dedicata, il voto dell’elettore, che viene pre-autorizzato a votare dal
+                                            creatore del quesito, è palese (non segreto).</p>
+
+                                    </div><!-- /.lqd-promo-content -->
+
+                                </div><!-- /.lqd-promo-inner -->
+                            </div><!-- /.lqd-promo-wrap -->
+
+                        </div><!-- /.lqd-column col-xs-12 -->
+                    </div><!-- /.row -->
+                </div><!-- /.container -->
+
+            </section>
+            <!-- /. slide 4 -->
+
+            <!-- slide 5 -->
+            <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
+
+                <div class="lqd-particles-bg-wrap">
+
+                    <div class="ld-particles-container">
+                        <div class="ld-particles-inner" id="ld-particles-7" data-particles="true"
+                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#fcdcd5","#e8e2be"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
+                        </div><!-- /.ld-particles-inner -->
+                    </div><!-- /.ld-particles-container -->
+
+                </div><!-- /.lqd-particles-bg-wrap -->
+
+                <div class="container">
+                    <div class="row">
+                        <div class="lqd-column col-xs-12">
+
+                            <div class="lqd-promo-wrap lqd-promo-alt lqd-promo-reverse">
+                                <div class="lqd-promo-inner">
+
+                                    <div class="lqd-promo-img">
+                                        <div class="lqd-promo-img-inner" data-reveal="true"
+                                            data-reveal-options='{ "direction": "rl", "bgcolor": "#fff", "revealSettings": { "duration": 800, "onCoverAnimations": { "scale": [2, 1] } } }'>
+                                            <figure>
+                                                <img src="./assets/img/vote5.jpg" alt="Promo">
+                                            </figure>
+                                        </div><!-- /.lqd-promo-img-inner -->
+                                    </div><!-- /.lqd-promo-img -->
+
+                                    <div class="lqd-promo-content" data-custom-animations="true"
+                                        data-ca-options='{ "triggerHandler": "inview", "animationTarget": ".btn", "duration": 800, "startDelay": 900, "initValues": { "translateY": 30, "opacity": 0 }, "animations": { "translateY": 0, "opacity": 1 } }'>
+                                        <div class="lqd-promo-cat" data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "li", "duration": 800, "delay": 100, "initValues": { "translateX": 15, "opacity": 0 }, "animations": { "translateX": 0, "opacity": 1 } }'>
+                                            <ul class="reset-ul comma-sep-li inline-nav text-uppercase">
+                                                <li>Quesito Segreto</li>
+                                            </ul>
+                                        </div><!-- /.lqd-promo-cat -->
+                                        <h2 data-split-text="true" data-split-options='{ "type": "chars, words" }'
+                                            data-custom-animations="true"
+                                            data-ca-options='{ "triggerHandler": "inview", "animationTarget": "all-childs", "duration": 800, "startDelay": 300, "delay": 25, "initValues": { "translateY": 25, "translateX": 15, "rotate": 12, "opacity": 0 }, "animations": { "translateY": 0, "translateX": 0, "rotate": 0, "opacity": 1 } }'>
+                                            Voto Segreto</h2>
+                                        <p>Il quesito della votazione è visualizzabile in chiaro, il voto dell’elettore
+                                            è in chiaro e tutti possono votare senza autorizzazione. utile per fini di
+                                            sondaggio.</p>
+
+                                    </div><!-- /.lqd-promo-content -->
+
+                                </div><!-- /.lqd-promo-inner -->
+                            </div><!-- /.lqd-promo-wrap -->
+
+                        </div><!-- /.lqd-column col-xs-12 -->
+                    </div><!-- /.row -->
+                </div><!-- /.container -->
+
+            </section>
+            <!-- /. slide 5 -->
+
+        </main>
+
+        </main><!-- /#content.content -->
+
+    </div><!-- /#wrap -->
+
+    <!--footer desk-->
+    <footer class="footer_desk main-footer bg-charade pt-70" data-sticky-footer="true">
+        <section>
+            <div class="row">
+
+                <div class="lqd-column col-md-2 col-md-offset-1 col-sm-6">
+
+                    <img src="./assets/img/scrypta_white.png"
+                        style="width: 60%; margin-top: 20px; margin-bottom: 20px;">
+                    <p class="widget-title text-white">Electio is powered by <strong>Scrypta</strong></p>
+
+                </div><!-- /.col-md-3 col-sm-6 -->
+
+                <div class="lqd-column col-md-2 col-md-offset-2 col-sm-6">
+                    <h3 class="widget-title text-white"><strong>OFFICIAL WEBSITES</strong></h3>
+                    <ul class="lqd-custom-menu reset-ul text-white">
+                        <li><a href="https://scryptachain.org/" target="_blank">Scrypta Blockchain</a></li>
+                        <li><a href="https://scrypta.foundation/" target="_blank">Scrypta Foundation</a></li>
+                        <li><a href="https://scryptaconsortium.org/" target="_blank">Scrypta Consortium</a></li>
+                        <li><a href="https://explorer.scryptachain.org/" target="_blank">Scrypta Block Explorer</a>
+                        </li>
+                        <li><a href="https://wiki.scryptachain.org/" target="_blank">Wiki-guide</a></li>
+                    </ul>
+                </div><!-- /.col-md-3 col-sm-6 -->
+
+                <div class="lqd-column col-md-2 col-sm-6">
+                    <h3 class="widget-title text-white"> <strong>SCRYPTA PRODUCTS</strong></h3>
+                    <ul class="lqd-custom-menu reset-ul text-white">
+                        <li><a href="https://manent.app/en/" target="_blank">Scrypta Manent</a></li>
+                        <li><a href="https://chains.planum.dev/" target="_blank">Planum</a></li>
+                        <li><a href="https://electio.app/" target="_blank">Electio</a></li>
+                        <li><a href="https://news.scryptachain.org/" target="_blank">Scrypta News</a></li>
+                        <li><a href="https://socialpay.live/" target="_blank">Social Pay</a></li>
+                    </ul>
+                </div><!-- /.col-md-3 col-sm-6 -->
+
+                <div class="lqd-column col-md-2 col-sm-6">
+                    <h3 class="widget-title text-white"><strong>BLOCKCHAIN STATS</strong></h3>
+                    <ul class="lqd-custom-menu reset-ul text-white">
+                        <li><a href="https://masternodes.online/currencies/LYRA/" target="_blank">Masternode
+                                Online</a></li>
+                        <li><a href="https://coins.masternode.buzz/LYRA" target="_blank">Masternode Buzz</a></li>
+                        <li><a href="https://www.coingecko.com/en/coins/scrypta" target="_blank">Coingecko</a>
+                        </li>
+                    </ul>
+                </div><!-- /.col-md-3 col-sm-6 -->
+
+            </div><!-- /.row -->
+
+        </section>
+
+        <section class="bt-fade-white-015 pt-35 pb-35 mt-50">
+            <div class="container">
+                <div class="row">
+
+                    <div class="lqd-column col-md-6">
+
+                        <ul class="lqd-custom-menu reset-ul inline-nav">
+                            <li>
+                                <a href="https://github.com/scryptachain/" target="_blank">
+                                    <i class="fa fa-github"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.facebook.com/scryptafoundation" target="_blank">
+                                    <i class="fa fa-facebook"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://twitter.com/scryptachain" target="_blank">
+                                    <i class="fa fa-twitter"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/company/scrypta-foundation/" target="_blank">
+                                    <i class="fa fa-linkedin"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://t.me/scryptachain_official" target="_blank">
+                                    <i class="fa fa-telegram"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://medium.com/@scryptachain" target="_blank">
+                                    <i class="fa fa-medium"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://discord.gg/8mfDRVK" target="_blank">
+                                    <i class="fab fa-discord"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://wiki.scryptachain.org/" target="_blank">
+                                    <i class="fa fa-wikipedia-w"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.youtube.com/channel/UCOANBiYyULoZwmaxjvOnM4Q" target="_blank">
+                                    <i class="fa fa-youtube"></i>
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div><!-- /.col-md-6 -->
+
+                    <div class="lqd-column col-md-6 text-md-right" style="margin-top: 10px;">
+                        <p class="my-0"><span style="font-size: 15px;">
+                                <span style="color: #FD678A;">Electio</span> is an
+                                <a href="https://github.com/scryptachain" target="_blank"
+                                    style="color: #FD678A;">open-source</a> project
+                                by
+                                <a href="https://scrypta.foundation" target="_blank" style="color: #FD678A;">Scrypta
+                                    Foundation</a>
+                            </span>
+                        </p>
+                    </div><!-- /.col-md-6 text-md-right -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container -->
+        </section>
+
+    </footer>
+    <!-- END Footer desk /.main-footer -->
+
+    <!--Footer mobile-->
+    <footer class="footer_mob main-footer bg-charade pt-70" data-sticky-footer="true">
+        <section>
+
+
+            <div class="container text-center">
+
+                <img src="./assets/img/scrypta_white.png" style="width: 60%; margin-top: 20px; margin-bottom: 20px;">
+                <p class="widget-title text-white">Electio is powered by <strong>Scrypta</strong></p>
+
+            </div><!-- /.col-md-3 col-sm-6 -->
+
+
+            <div class="container text-center">
+                <h3 class="widget-title text-white"><strong>OFFICIAL WEBSITES</strong></h3>
+                <ul class="lqd-custom-menu reset-ul text-white">
+                    <li><a href="https://scryptachain.org/" target="_blank">Scrypta Blockchain</a></li>
+                    <li><a href="https://scrypta.foundation/" target="_blank">Scrypta Foundation</a></li>
+                    <li><a href="https://scryptaconsortium.org/" target="_blank">Scrypta Consortium</a></li>
+                    <li><a href="https://explorer.scryptachain.org/" target="_blank">Scrypta Block Explorer</a>
+                    </li>
+                    <li><a href="https://wiki.scryptachain.org/" target="_blank">Wiki-guide</a></li>
+                </ul>
+            </div><!-- /.col-md-3 col-sm-6 -->
+
+            <div class="container text-center">
+                <h3 class="widget-title text-white"> <strong>SCRYPTA PRODUCTS</strong></h3>
+                <ul class="lqd-custom-menu reset-ul text-white">
+                    <li><a href="https://manent.app/en/" target="_blank">Scrypta Manent</a></li>
+                    <li><a href="https://chains.planum.dev/" target="_blank">Planum</a></li>
+                    <li><a href="https://electio.app/" target="_blank">Electio</a></li>
+                    <li><a href="https://news.scryptachain.org/" target="_blank">Scrypta News</a></li>
+                    <li><a href="https://socialpay.live/" target="_blank">Social Pay</a></li>
+                </ul>
+            </div><!-- /.col-md-3 col-sm-6 -->
+
+        </section>
+
+        <section class="bt-fade-white-015 pt-35 pb-35 mt-50">
+            <div class="container text-center">
+                <ul class="lqd-custom-menu reset-ul inline-nav">
+                    <li>
+                        <a href="https://github.com/scryptachain/" target="_blank">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com/scryptafoundation" target="_blank">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://twitter.com/scryptachain" target="_blank">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.linkedin.com/company/scrypta-foundation/" target="_blank">
+                            <i class="fa fa-linkedin"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://t.me/scryptachain_official" target="_blank">
+                            <i class="fa fa-telegram"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://medium.com/@scryptachain" target="_blank">
+                            <i class="fa fa-medium"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://discord.gg/8mfDRVK" target="_blank">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://wiki.scryptachain.org/" target="_blank">
+                            <i class="fa fa-wikipedia-w"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.youtube.com/channel/UCOANBiYyULoZwmaxjvOnM4Q" target="_blank">
+                            <i class="fa fa-youtube"></i>
+                        </a>
+                    </li>
+                </ul>
+
+            </div><!-- /.col-md-6 -->
+
+            <div class="container text-center" style="margin-top: 10px;">
+                <p class="my-0"><span style="font-size: 15px;">
+                        <span style="color: #FD678A;">Electio</span> is an
+                        <a href="https://github.com/scryptachain" target="_blank"
+                            style="color: #FD678A;">open-source</a> project
+                        by
+                        <a href="https://scrypta.foundation" target="_blank" style="color: #FD678A;">Scrypta
+                            Foundation</a>
+                    </span>
+                </p>
+            </div><!-- /.col-md-6 text-md-right -->
+
+
+
+        </section>
+
+    </footer>
+    <!-- END Footer mobile /.main-footer -->
+
+    <script src="./assets/vendors/jquery.min.js"></script>
+    <script src="./assets/js/theme-vendors.js"></script>
+    <script src="./assets/vendors/pagePiling/dist/jquery.pagepiling.min.js"></script>
+    <script src="./assets/js/theme.min.js"></script>
+
+</body>
+
+<style>
+    @media screen and (max-width: 768px) {
+
+        .desk_menu {
+            display: none !important;
+        }
+
+        .footer_desk {
+            display: none;
+        }
+
+    }
+
+    @media screen and (min-width: 769px) {
+
+        .mobile_menu {
+            display: none;
+        }
+
+        .logo_desk {
+            width: 80%;
+        }
+
+        .header-side .mainbar,
+        .header-side .mainbar-container,
+        .header-side .mainbar-row,
+        .header-side .mainbar-wrap {
+            width: 110% !important;
+        }
+
+        .lqd-stack-has-prevnext-buttons .lqd-stack-prevnext-wrap button {
+            display: none !important;
+        }
+
+        .footer_mob {
+            display: none;
+        }
+    }
+</style>
+
+</html>
