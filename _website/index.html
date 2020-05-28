@@ -33,14 +33,13 @@
     <!-- Head Libs -->
     <script async src="assets/vendors/modernizr.min.js"></script>
 
-</head>
-
+</head>  
 <body class="lqd-stack-buttons-style-1 header-style-side lqd-stack-effect-slideOver"
     data-mobile-nav-trigger-alignment="right" data-mobile-nav-align="left" data-mobile-nav-style="minimal"
     data-mobile-nav-shceme="gray" data-mobile-header-scheme="gray" data-mobile-nav-breakpoint="1199">
 
     <div id="wrap">
-
+        
         <!--desk header -->
         <header class="main-header header-fullscreen header-fullscreen-style-1 main-header-overlay">
 
@@ -296,21 +295,10 @@
         </header>
         <!-- /.main-header -->
 
-        <main id="content" class="content" data-liquid-stack="true"
-            data-stack-options='{"navigation":false, "prevNextButtons":false, "pageNumber":true, "prevNextLabels":{"prev":"Previous", "next":"Next"}, "effect":"slideOver", "disableOnMobile: true"}'>
+        <main id="content" class="content">
 
             <!-- main slide-->
             <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
-
-                <div class="lqd-particles-bg-wrap">
-
-                    <div class="ld-particles-container">
-                        <div class="ld-particles-inner" id="ld-particles-1" data-particles="true"
-                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#b9dee2","#ffe3dd"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
-                        </div><!-- /.ld-particles-inner -->
-                    </div><!-- /.ld-particles-container -->
-
-                </div><!-- /.lqd-particles-bg-wrap -->
 
                 <div class="container">
                     <div class="row">
@@ -358,16 +346,6 @@
 
             <!-- slide 1-->
             <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
-
-                <div class="lqd-particles-bg-wrap">
-
-                    <div class="ld-particles-container">
-                        <div class="ld-particles-inner" id="ld-particles-2" data-particles="true"
-                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#b9dee2","#ffe3dd"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
-                        </div><!-- /.ld-particles-inner -->
-                    </div><!-- /.ld-particles-container -->
-
-                </div><!-- /.lqd-particles-bg-wrap -->
 
                 <div class="container">
 
@@ -665,16 +643,6 @@
             <!-- slide 2 -->
             <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
 
-                <div class="lqd-particles-bg-wrap">
-
-                    <div class="ld-particles-container">
-                        <div class="ld-particles-inner" id="ld-particles-3" data-particles="true"
-                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#dfe8cb","#f9d7cc"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
-                        </div><!-- /.ld-particles-inner -->
-                    </div><!-- /.ld-particles-container -->
-
-                </div><!-- /.lqd-particles-bg-wrap -->
-
                 <div class="container">
                     <div class="row">
                         <div class="lqd-column col-xs-12">
@@ -723,16 +691,6 @@
             <!-- slide 3 -->
             <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
 
-                <div class="lqd-particles-bg-wrap">
-
-                    <div class="ld-particles-container">
-                        <div class="ld-particles-inner" id="ld-particles-5" data-particles="true"
-                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#fcdcd5","#e8e2be"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
-                        </div><!-- /.ld-particles-inner -->
-                    </div><!-- /.ld-particles-container -->
-
-                </div><!-- /.lqd-particles-bg-wrap -->
-
                 <div class="container">
                     <div class="row">
                         <div class="lqd-column col-xs-12">
@@ -780,16 +738,6 @@
 
             <!-- slide 4-->
             <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-white py-5">
-
-                <div class="lqd-particles-bg-wrap">
-
-                    <div class="ld-particles-container">
-                        <div class="ld-particles-inner" id="ld-particles-6" data-particles="true"
-                            data-particles-options='{"particles":{"number":{"value":2,"density":1},"color":{"value":["#fcdcd5","#e8e2be"]},"shape":{"type":["circle"]},"size":{"value":450},"move":{"enable":true,"direction":"top","speed":2,"random":true,"out_mode":"out"}},"interactivity":[]}'>
-                        </div><!-- /.ld-particles-inner -->
-                    </div><!-- /.ld-particles-container -->
-
-                </div><!-- /.lqd-particles-bg-wrap -->
 
                 <div class="container">
                     <div class="row">
@@ -956,6 +904,12 @@
 </body>
 
 <style>
+    .vc_row, #content{
+        width: 100%;
+    }
+    #wrap{
+        padding:0!important;
+    }
     @media screen and (max-width: 768px) {
 
         body {
