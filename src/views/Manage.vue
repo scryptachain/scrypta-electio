@@ -228,6 +228,27 @@
       }
     },
     methods: {
+      normalizeNumber(number){
+        let normalized = ''
+        if(parseFloat(number) < 10 && parseFloat(number) > 0){
+          normalized += '0' + number.replace('0','')
+        }else{
+          normalized += number
+        }
+        return normalized
+      },
+      normalizeDate(date){
+        let exp = date.split('-')
+        let m = this.normalizeNumber(exp[1])
+        let d = this.normalizeNumber(exp[2])
+        return exp[0] +'-'+ m +'-'+ d
+      },
+      normalizeTime(time){
+        let exp = time.split(':')
+        let h = this.normalizeNumber(exp[0])
+        let m = this.normalizeNumber(exp[1])
+        return h + ':' + m + ':00'
+      },
       decryptPoll(){
         const app = this
         app.$buefy.dialog.prompt({
@@ -250,8 +271,12 @@
                       app.votes[y] = 0
                     }
                     await app.fetchStats()
-                    let start = moment(app.poll.start_date + 'T' + app.poll.start_time + ':00')
-                    let end = moment(app.poll.end_date + 'T' + app.poll.end_time + ':00')
+                    let start_date = app.normalizeDate(app.poll.start_date)
+                    let start_time = app.normalizeTime(app.poll.start_time)
+                    let start = moment(start_date + 'T' + start_time)
+                    let end_date = app.normalizeDate(app.poll.end_date)
+                    let end_time = app.normalizeTime(app.poll.end_time)
+                    let end = moment(end_date + 'T' + end_time)
                     var visible = moment().isAfter(start)
                     if(visible === true){
                       var next = moment().isBefore(end)

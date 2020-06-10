@@ -60,8 +60,14 @@
         var dna = polls[i].data.dna
         var authorized = polls[i].data.authorized
         if(poll !== undefined && dna !== undefined && dna.type !== undefined && dna.type !== 'SECRET'){
-          let start = moment(poll.start_date + 'T' + poll.start_time + ':00')
-          let end = moment(poll.end_date + 'T' + poll.end_time + ':00')
+          
+          let start_date = app.normalizeDate(poll.start_date)
+          let start_time = app.normalizeTime(poll.start_time)
+          let start = moment(start_date + 'T' + start_time)
+          let end_date = app.normalizeDate(poll.end_date)
+          let end_time = app.normalizeTime(poll.end_time)
+          let end = moment(end_date + 'T' + end_time)
+          
           if(moment().isAfter(start)){
             if(moment().isBefore(end)){
               app.activePolls.push(polls[i])
@@ -84,6 +90,29 @@
         }
       }
       app.isLoading = false
+    },
+    methods: {
+      normalizeNumber(number){
+        let normalized = ''
+        if(parseFloat(number) < 10 && parseFloat(number) > 0){
+          normalized += '0' + number.replace('0','')
+        }else{
+          normalized += number
+        }
+        return normalized
+      },
+      normalizeDate(date){
+        let exp = date.split('-')
+        let m = this.normalizeNumber(exp[1])
+        let d = this.normalizeNumber(exp[2])
+        return exp[0] +'-'+ m +'-'+ d
+      },
+      normalizeTime(time){
+        let exp = time.split(':')
+        let h = this.normalizeNumber(exp[0])
+        let m = this.normalizeNumber(exp[1])
+        return h + ':' + m + ':00'
+      }
     }
   }
 </script>

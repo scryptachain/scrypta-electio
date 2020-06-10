@@ -58,6 +58,27 @@
       app.fetchAllPolls()
     },
     methods: {
+      normalizeNumber(number){
+        let normalized = ''
+        if(parseFloat(number) < 10 && parseFloat(number) > 0){
+          normalized += '0' + number.replace('0','')
+        }else{
+          normalized += number
+        }
+        return normalized
+      },
+      normalizeDate(date){
+        let exp = date.split('-')
+        let m = this.normalizeNumber(exp[1])
+        let d = this.normalizeNumber(exp[2])
+        return exp[0] +'-'+ m +'-'+ d
+      },
+      normalizeTime(time){
+        let exp = time.split(':')
+        let h = this.normalizeNumber(exp[0])
+        let m = this.normalizeNumber(exp[1])
+        return h + ':' + m + ':00'
+      },
       async fetchAllPolls(){
         const app = this
         let response = await app.scrypta.post('/read',{ protocol: 'poll://' })
@@ -67,8 +88,12 @@
           var dna = polls[i].data.dna
           var authorized = polls[i].data.authorized
           if(dna !== undefined && dna.owner === app.address){
-            let start = moment(poll.start_date + 'T' + poll.start_time + ':00')
-            let end = moment(poll.end_date + 'T' + poll.end_time + ':00')
+            let start_date = app.normalizeDate(poll.start_date)
+            let start_time = app.normalizeTime(poll.start_time)
+            let start = moment(start_date + 'T' + start_time)
+            let end_date = app.normalizeDate(poll.end_date)
+            let end_time = app.normalizeTime(poll.end_time)
+            let end = moment(end_date + 'T' + end_time)
             if(dna.type !== 'SECRET'){
               var visible = moment().isAfter(start)
               if(visible === true){
