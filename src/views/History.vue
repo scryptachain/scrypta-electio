@@ -1,7 +1,7 @@
 <template>
   <div class="main text-left">
     <div class="container">
-        <h1>Your history</h1>
+        <h1>Polls you've created</h1>
         <hr>
         <div v-if="secretPolls.length > 0">
           <h3 class="title is-4">Secret polls</h3>
@@ -19,6 +19,11 @@
           <h3 class="title is-4">Past polls</h3>
           <div v-for="poll in prevPolls" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
         </div>
+        <div v-if="votedPolls.length > 0">
+          <h1>Polls you've voted</h1><hr>
+          <div v-for="poll in votedPolls" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
+        </div>
+        <div v-if="searchingParticipated">Searching for polls you've voted...</div>
         <div v-if="isLoading">Loading polls from the blockchain...</div>
         <div class="text-center" v-if="activePolls.length === 0 && nextPolls.length === 0 && prevPolls.length === 0 && secretPolls.length === 0 && !isLoading">
           Nothing to show here, do you want to create a new poll?<br><br>
@@ -41,10 +46,13 @@
         address: '',
         wallet: '',
         isLoading: true,
+        searchingParticipated: false,
         activePolls: [],
         secretPolls: [],
         nextPolls: [],
-        prevPolls: []
+        prevPolls: [],
+        votedPolls: [],
+        votedPollsCheck: []
       }
     },
     async mounted() {
@@ -79,13 +87,40 @@
         let m = this.normalizeNumber(exp[1])
         return h + ':' + m + ':00'
       },
+      checkIfVoted(address, poll, dna){
+        const app = this
+        return new Promise(prom => {
+          app.scrypta.post('/received',
+            { 
+              address: address
+            })
+            .then(function (response) {
+              if(response !== undefined){
+              let txs = response.data
+                for(let i in txs){
+                  let tx=txs[i]
+                  let exp = tx.data.split(':')
+                  if(tx.sender === app.address && exp[1] === '//VOTE' && dna.votetype === 'PUBLIC'){
+                    if(app.votedPollsCheck.indexOf(address) === -1){
+                      app.votedPollsCheck.push(address)
+                      app.votedPolls.push(poll)
+                    }
+                  }
+                }
+                prom(true)
+              }else{
+                prom(false)
+              }
+            })
+        })
+      },
       async fetchAllPolls(){
         const app = this
         let response = await app.scrypta.post('/read',{ protocol: 'poll://' })
         var polls = response.data
-        for (var i=0; i < polls.length; i++){
-          var poll = polls[i].data.poll
-          var dna = polls[i].data.dna
+        for (let i=0; i < polls.length; i++){
+          let poll = polls[i].data.poll
+          let dna = polls[i].data.dna
           var authorized = polls[i].data.authorized
           if(dna !== undefined && dna.owner === app.address){
             let start_date = app.normalizeDate(poll.start_date)
@@ -114,6 +149,12 @@
           }
         }
         app.isLoading = false
+        app.searchingParticipated = true
+        for (let i=0; i < polls.length; i++){
+          let dna = polls[i].data.dna
+          await app.checkIfVoted(polls[i].address, polls[i], dna)
+        }
+        app.searchingParticipated = false
       }
     }
   }
