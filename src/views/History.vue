@@ -20,7 +20,7 @@
           <div v-for="poll in prevPolls" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
         </div>
         <div v-if="votedPolls.length > 0">
-          <h1>Polls you've voted</h1><hr>
+          <h1>Public Polls you've voted</h1><hr>
           <div v-for="poll in votedPolls" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
         </div>
         <div v-if="searchingParticipated">Searching for polls you've voted...</div>
