@@ -7,8 +7,11 @@
         </div>
         <div v-if="!isLoading && isDecrypted">
           <section>
-            <b-message v-if="userVoted" title="Attention please!" type="is-danger" aria-close-label="Close message">
+            <b-message v-if="userVoted && !isEnded" title="Attention please!" type="is-danger" aria-close-label="Close message">
               You've voted yet for this poll, please remember that you can vote again and the last vote will be considered.
+            </b-message>
+            <b-message v-if="dna.owner === address " title="Attention please!" type="is-danger" aria-close-label="Close message">
+              You're the <b>owner</b> of this pool and you can't vote!
             </b-message>
             <v-gravatar :email="dna.owner" style="float:left; margin-right:20px; width:100px; height:100px;" />
             <h1>{{ poll.name }}</h1>
@@ -47,8 +50,8 @@
               </b-button>
             </div>
             <br>
-            <div v-if="isEnded" class="text-center">
-              Sorry, the poll is ended.
+            <div v-if="countingVotes" class="text-center">
+              Counting votes, please wait..
             </div>
             <div v-if="!isStarted" class="text-center">
               Sorry, the poll has not started.
@@ -87,6 +90,7 @@
         isDecrypted: true,
         isUploading: false,
         isFuture: false,
+        countingVotes: false,
         canVote: true,
         isPast: false,
         poll: {},
@@ -94,11 +98,13 @@
         dna: {},
         results: {},
         voteCard: '',
-        votes: []
+        votes: {}
       }
     },
     async mounted() {
       const app = this
+      app.scrypta.staticnodes = true
+      app.scrypta.mainnetIdaNodes = ['https://idanodejs01.scryptachain.org','https://idanodejs02.scryptachain.org','https://idanodejs03.scryptachain.org','https://idanodejs04.scryptachain.org','https://idanodejs05.scryptachain.org','https://idanodejs06.scryptachain.org']
       app.wallet = await app.scrypta.returnDefaultIdentity()
       let SIDS = app.wallet.split(':')
       app.address = SIDS[0]
@@ -179,13 +185,14 @@
 
         let authorizedCount = 0
         let votesCount = 0
-
+        app.countingVotes = true
         await app.scrypta.post('/received',
           { 
             address: app.pollAddress
           })
           .then(function (response) {
             var txs = response.data
+            let votes = {}
             for(let i in txs){
               var tx=txs[i]
               var exp = tx.data.split(':')
@@ -196,13 +203,13 @@
               }
               if(exp[0] === 'poll' && exp[1] === '//VOTE'){
                 votesCount++
-                if(app.votes[exp[2]] === undefined){
-                  app.votes[exp[2]] = 0
+                if(votes[exp[2]] === undefined){
+                  votes[exp[2]] = 0
                 }
-                if(app.votes[exp[2]]){
-                  app.votes[exp[2]] ++
+                if(votes[exp[2]] !== undefined){
+                  votes[exp[2]] ++
                 }else{
-                  app.votes[exp[2]] = 1
+                  votes[exp[2]] = 1
                 }
               }
               if(exp[3] !== undefined && exp[2] === app.address && exp[1] === '//AUTH' && tx.sender === app.dna.owner){
@@ -222,6 +229,8 @@
                 app.isEnded = true
               }
             }
+            app.votes = votes
+            app.countingVotes = false
           })
       },
       decryptPoll(){

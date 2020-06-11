@@ -175,6 +175,9 @@
     async mounted() {
       const app = this
       app.wallet = await app.scrypta.returnDefaultIdentity()
+
+      app.scrypta.staticnodes = true
+      app.scrypta.mainnetIdaNodes = ['https://idanodejs01.scryptachain.org','https://idanodejs02.scryptachain.org','https://idanodejs03.scryptachain.org','https://idanodejs04.scryptachain.org','https://idanodejs05.scryptachain.org','https://idanodejs06.scryptachain.org']
       let SIDS = app.wallet.split(':')
       app.address = SIDS[0]
       let identity = await app.scrypta.returnIdentity(app.address)
@@ -522,24 +525,24 @@
         { 
           address: app.pollAddress
         })
-
+        let votes = {}
         var txs = response.data
         for(let i in txs){
           var tx=txs[i]
           var exp = tx.data.split(':')
 
           for(let x in app.poll.answers){
-            app.votes[x] = 0
+            votes[x] = 0
           }
           
           if(exp[0] === 'poll' && exp[1] === '//VOTE'){
-            if(app.votes[exp[2]]){
-              app.votes[exp[2]] ++
+            if(votes[exp[2]]){
+              votes[exp[2]] ++
             }else{
-              app.votes[exp[2]] = 1
+              votes[exp[2]] = 1
             }
           }
-          
+          app.votes = votes
           if(exp[0] === 'poll' && exp[1] === '//START'){
             if(tx.sender === app.dna.owner){
               app.isStarted = true

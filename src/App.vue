@@ -340,7 +340,9 @@ export default {
 #nav {
   padding: 30px;
 }
-
+.container{
+  padding: 0 10px;
+}
 #nav a {
   font-weight: bold;
   color: #2c3e50;

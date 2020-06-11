@@ -77,7 +77,9 @@
             const app = this
             app.checkJoinPoll()
             if(app.poll.data.dna.type !== 'SECRET'){
-                let end = moment(app.poll.data.poll.end_date + 'T' + app.poll.data.poll.end_time + ':00')
+                let end_date = app.normalizeDate(app.poll.data.poll.end_date)
+                let end_time = app.normalizeTime(app.poll.data.poll.end_time)
+                let end = moment(end_date + 'T' + end_time)
                 if(moment().isAfter(end)){
                     app.isEnded = true
                 }
@@ -224,6 +226,27 @@
                         type: 'is-danger'
                     })
                 }
+            },
+            normalizeNumber(number){
+                let normalized = ''
+                if(parseFloat(number) < 10 && parseFloat(number) > 0){
+                    normalized += '0' + number.replace('0','')
+                }else{
+                    normalized += number
+                }
+                return normalized
+            },
+            normalizeDate(date){
+                let exp = date.split('-')
+                let m = this.normalizeNumber(exp[1])
+                let d = this.normalizeNumber(exp[2])
+                return exp[0] +'-'+ m +'-'+ d
+            },
+            normalizeTime(time){
+                let exp = time.split(':')
+                let h = this.normalizeNumber(exp[0])
+                let m = this.normalizeNumber(exp[1])
+                return h + ':' + m + ':00'
             }
         }
     }

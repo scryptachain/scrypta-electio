@@ -89,7 +89,10 @@
                             })
                             app.isDecrypted = true
                             app.decrypted = JSON.parse(decrypted)
-                            app.isEnded = moment().isAfter(decrypted.start_date + ' ' + decrypted.start_time)
+                            let end_date = app.normalizeDate(decrypted.end_date)
+                            let end_time = app.normalizeTime(decrypted.end_time)
+                            let end = moment(end_date + 'T' + end_time)
+                            app.isEnded = moment().isAfter(end)
                             localStorage.setItem('pollPwD', password)
                             if(app.address === app.poll.data.dna.owner){
                                 window.location = '/#/manage/' + app.poll.uuid

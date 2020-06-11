@@ -17,8 +17,20 @@
           <h3 class="title is-4">Secret polls you're invited</h3>
           <div v-for="poll in secretPolls" v-bind:key="poll.uuid"><SecretPoll :poll="poll" :address="address" /></div>
         </div>
+        <div v-if="prevPolls.length > 0">
+          <h3 class="title is-4">Ended polls</h3>
+          <div v-if="showAll">
+            <div v-for="poll in prevPolls" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
+          </div>
+          <div v-if="!showAll">
+            <div v-for="poll in prevPollsLimited" v-bind:key="poll.uuid"><PublicPoll :poll="poll" :address="address" /></div>
+            <div style="text-align:center">
+              <b-button v-on:click="showAllPast" type="is-primary">Show all</b-button>
+            </div>
+          </div>
+        </div>
         <div v-if="isLoading">Loading polls from the blockchain...</div>
-        <div class="text-center" v-if="activePolls.length === 0 && secretPolls.length === 0  && nextPolls.length === 0 && !isLoading">
+        <div class="text-center" v-if="activePolls.length === 0 && secretPolls.length === 0  && nextPolls.length === 0  && prevPolls.length === 0 && !isLoading">
           Nothing to show here, do you want to create a new poll?<br><br>
           <a href="/#/create"><b-button size="is-medium" type="is-primary">Create a Poll Now!</b-button></a>
         </div>
@@ -42,6 +54,8 @@
         activePolls: [],
         nextPolls: [],
         prevPolls: [],
+        prevPollsLimited: [],
+        showAll: false,
         secretPolls: []
       }
     },
@@ -74,6 +88,9 @@
             }
             if(moment().isAfter(end)){
               app.prevPolls.push(polls[i])
+              if(i <= 3){
+                app.prevPollsLimited.push(polls[i])
+              }
             }
           } else {
             app.nextPolls.push(polls[i])
@@ -92,6 +109,9 @@
       app.isLoading = false
     },
     methods: {
+      showAllPast(){
+        this.showAll = true
+      },
       normalizeNumber(number){
         let normalized = ''
         if(parseFloat(number) < 10 && parseFloat(number) > 0){
