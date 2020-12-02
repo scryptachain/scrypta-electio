@@ -11,7 +11,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 var SocialSharing = require('vue-social-sharing')
-
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
+Vue.component('apexchart', VueApexCharts)
 Vue.use(SocialSharing)
 library.add(faChevronDown)
 Vue.component('vue-fontawesome', FontAwesomeIcon);

@@ -74,23 +74,9 @@
           <div class="container" style="margin-top:50px;" id="login">
             <div class="card">
               <div style="padding: 50px 20px;">
-                <img src="/logo.png"><br>
-                <h1 class="title is-1">Scrypta Electio</h1><br>
-                <h2 class="subtitle">
-                  Enter with 
-                  <a
-                    href="https://id.scryptachain.org"
-                  >Scrypta Extension Browser</a> or enter with your existing .sid file.
-                  <br />
-                  <br />
-                  <b-upload v-model="file" v-on:input="loadWalletFromFile" drag-drop>
-                    <section class="section">
-                      <div class="content has-text-centered text-center" style="text-align:center!important; width:100%">
-                        <p class="text-center" style="text-align:center!important;">Drag and drop your .sid here or click to upload.</p>
-                      </div>
-                    </section>
-                  </b-upload>
-                </h2>
+                <img src="/logo.png" style="width:200px"><br><br>
+                You're few steps away!<br>Please login the platform by clicking below.<br><br>
+                <div id="scrypta-login" gateway="0240f294ef20c7bbb82bae24d8d22c7ab94d195adf153162482b6bf540393d7dd5" dapp="Electio"></div>
               </div>
             </div>
             <br />Scrypta Electio is an

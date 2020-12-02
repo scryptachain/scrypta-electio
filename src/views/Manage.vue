@@ -3,26 +3,6 @@
     <div class="container">
         <h1>Manage poll</h1>
         <h3>{{ pollAddress }}</h3>
-        <social-sharing :url="'https://polls.scryptachain.org/#/poll/' + $route.params.uuid" inline-template>
-          <div class="social-shares">
-            <b>Share on: </b>
-            <network network="linkedin">
-              <i class="fa fa-fw fa-linkedin"></i> LinkedIn
-            </network>
-            <network network="reddit">
-              <i class="fa fa-fw fa-reddit"></i> Reddit
-            </network>
-            <network network="twitter">
-              <i class="fa fa-fw fa-twitter"></i> Twitter
-            </network>
-            <network network="telegram">
-              <i class="fa fa-telegram"></i> Telegram
-            </network>
-            <network network="whatsapp">
-              <i class="fa fa-fw fa-whatsapp"></i> Whatsapp
-            </network>
-          </div>
-        </social-sharing>
         <hr>
         <div v-if="isLoading">Loading poll from the blockchain...</div>
         <div v-if="!isLoading && !isDecrypted">
