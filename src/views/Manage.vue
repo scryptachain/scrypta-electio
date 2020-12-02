@@ -28,9 +28,13 @@
 
                 <b-tab-item label="Votes">
                   <br>
-                  <ul>
-                    <li v-for="(answer, index) in poll.answers" disabled class="title is-4" v-bind:key="answer.answer" style="margin: 0 10px;">{{ answer.answer }}: {{ votes[index] }}</li>
-                  </ul>
+                  <apexchart
+                    width="100%"
+                    height="350px"
+                    type="bar"
+                    :options="txOptions"
+                    :series="txSeries"
+                  ></apexchart>
                 </b-tab-item>
 
                 <b-tab-item v-if="dna.votetype === 'SECRET'" label="Authorizations">
@@ -149,7 +153,23 @@
         sentCards: [],
         pubkeys: [],
         accepted: {},
-        votes: []
+        votes: [],
+        answers: [],
+        activeSeriesIndex: 0,
+        txOptions: {
+          chart: {
+            id: "chart-votes",
+          },
+          xaxis: {
+            categories: [],
+          },
+        },
+        txSeries: [
+          {
+            name: "Votes",
+            data: [],
+          },
+        ],
       }
     },
     async mounted() {
@@ -507,20 +527,30 @@
         })
         let votes = {}
         var txs = response.data
+
+        app.txOptions.xaxis.categories = [];
+        app.txSeries.data = [];
+        for(let k in app.poll.answers){
+          app.answers[k] = app.poll.answers[k].answer
+          app.txSeries[0].data[k] = 0
+          app.txOptions.xaxis.categories.push(app.poll.answers[k].answer);
+        }
+
+        for(let x in app.poll.answers){
+          votes[x] = 0
+        }
+        
         for(let i in txs){
           var tx=txs[i]
           var exp = tx.data.split(':')
-
-          for(let x in app.poll.answers){
-            votes[x] = 0
-          }
           
           if(exp[0] === 'poll' && exp[1] === '//VOTE'){
-            if(votes[exp[2]]){
-              votes[exp[2]] ++
+            if(votes[exp[2]] !== undefined){
+              votes[exp[2]] = votes[exp[2]] + 1
             }else{
               votes[exp[2]] = 1
             }
+            app.txSeries[0].data[exp[2]] = votes[exp[2]]
           }
           app.votes = votes
           if(exp[0] === 'poll' && exp[1] === '//START'){
