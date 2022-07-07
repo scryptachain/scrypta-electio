@@ -16,7 +16,7 @@
     "apexcharts": "^3.22.2",
     "buefy": "^0.9.4",
     "core-js": "^3.8.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "node-rsa": "^1.1.1",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.12",
